@@ -9,15 +9,21 @@
     "webRequest"
   ],
   "host_permissions": [
-    "https://www.amazon.com/*"
+    "https://www.amazon.com/*",
+    "https://www.amazon.com/*/dp/*",
+    "https://www.amazon.com/dp/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://www.amazon.com/s?i=mobile&rh=n%3A7072561011&s=popularity-rank&fs=true"
+        "https://www.amazon.com/s*",
+        "https://www.amazon.com/dp/*",
+        "https://www.amazon.com/*/dp/*"
       ],
       "js": [
-        "content.js"
+        "content.js",
+        "product_details_scraper.js", // Include the new file
+        "review_scraper.js"
       ],
       "run_at": "document_idle"
     }

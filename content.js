@@ -34,28 +34,19 @@
             console.warn(`Could not parse pageNumber from URL: ${pageUrl}`, error);
         }
 
-        console.log(`[DEBUG] START fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`); // START LOG
+        console.log(`[DEBUG] START fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`);
 
         try {
-            const response = await fetch(pageUrl, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'text/html, application/xhtml+xml, */*; q=0.8',
-                    'Referer': pageUrl
-                }
-            });
-
+            const response = await fetch(pageUrl);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status} for URL: ${pageUrl} (AJAX)`);
             }
-            const htmlFragment = await response.text();
-            // console.log("[DEBUG] HTML Fragment Response:", htmlFragment); // Optionally log the HTML fragment itself (can be verbose)
-
-            const parsedReviews = parseReviewsFromHtmlFragment(htmlFragment);
+            const reviewHtml = await response.text();
+            const parsedReviews = parseReviewsFromHtmlFragment(reviewHtml);
             accumulatedReviews.push(...parsedReviews);
             console.log(`[DEBUG] Parsed ${parsedReviews.length} ${reviewType} reviews from page ${currentPageNumber} (AJAX), Total accumulated: ${accumulatedReviews.length}`);
 
-            const nextPageLinkHref = findNextPageLinkHrefFromFragment(htmlFragment);
+            const nextPageLinkHref = findNextPageLinkHrefFromFragment(reviewHtml);
 
             if (nextPageLinkHref) {
                 const nextPageUrl = new URL(nextPageLinkHref, pageUrl).href;
@@ -63,18 +54,17 @@
                 return fetchReviewPage(asin, reviewType, nextPageUrl, accumulatedReviews);
             } else {
                 console.log(`[DEBUG] No more ${reviewType} review pages found for ASIN: ${asin} (AJAX). Total ${reviewType} reviews: ${accumulatedReviews.length}`);
-                return accumulatedReviews;
+                return { accumulatedReviews: accumulatedReviews, reviewHtml: reviewHtml };
             }
 
         } catch (error) {
-            console.error(`[DEBUG] ERROR in fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`, error); // ERROR LOG
-            return accumulatedReviews;
+            console.error(`[DEBUG] ERROR in fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`, error);
+            return { accumulatedReviews: accumulatedReviews, reviewHtml: null };
         } finally {
-            console.log(`[DEBUG] END fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`); // END LOG
+            console.log(`[DEBUG] END fetchReviewPage - ${reviewType} - Page ${currentPageNumber} - URL: ${pageUrl}`);
         }
     }
 
-    // --- New function to parse reviews from HTML *fragment* ---
     function parseReviewsFromHtmlFragment(htmlFragment) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlFragment, 'text/html');
@@ -101,22 +91,19 @@
             }
             reviews.push(review);
         });
-        console.log(`[DEBUG] parseReviewsFromHtmlFragment - Parsed ${reviews.length} reviews from fragment`); // DEBUG LOG in fragment parser
+        console.log(`[DEBUG] parseReviewsFromHtmlFragment - Parsed ${reviews.length} reviews from fragment`);
         return reviews;
     }
 
-    // --- New function to find "Next Page" link in HTML *fragment* ---
     function findNextPageLinkHrefFromFragment(htmlFragment) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlFragment, 'text/html');
         const nextPageElement = doc.querySelector('.a-pagination .a-last:not(.a-disabled) a');
         const nextPageHref = nextPageElement ? nextPageElement.getAttribute('href') : null;
-        console.log(`[DEBUG] findNextPageLinkHrefFromFragment - Next Page Href: ${nextPageHref}`); // DEBUG LOG for next page link
+        console.log(`[DEBUG] findNextPageLinkHrefFromFragment - Next Page Href: ${nextPageHref}`);
         return nextPageHref;
     }
 
-
-    // --- Keep the original function for initial page load if needed ---
     function findNextPageLinkHref(html) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -124,8 +111,7 @@
         return nextPageElement ? nextPageElement.getAttribute('href') : null;
     }
 
-
-    async function sendReviewsToServer(asin, allReviews, criticalReviews) {
+    async function sendReviewsToServer(asin, allReviews, criticalReviews, productDetailsHtml, reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml) {
         const serverUrl = 'http://localhost:3000/save-reviews';
 
         try {
@@ -137,7 +123,11 @@
                 body: JSON.stringify({
                     asin: asin,
                     allReviews: allReviews,
-                    criticalReviews: criticalReviews
+                    criticalReviews: criticalReviews,
+                    productDetailsHtml: productDetailsHtml,
+                    reviewHtml: reviewHtml,
+                    aodMainProductDetailsHtml: aodMainProductDetailsHtml,
+                    aodSellerInfoHtml: aodSellerInfoHtml
                 })
             });
 
@@ -153,42 +143,99 @@
         }
     }
 
+    async function fetchProductDetailsPage(asin) {
+        const productDetailsUrl = `https://www.amazon.com/dp/${asin}/`;
+        console.log(`[DEBUG] Fetching product details page: ${productDetailsUrl}`);
+
+        try {
+            const response = await fetch(productDetailsUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} for product details page URL: ${productDetailsUrl}`);
+            }
+            const productDetailsHtml = await response.text();
+            console.log(`[DEBUG] Product details page fetched successfully for ASIN: ${asin}`);
+            return productDetailsHtml;
+        } catch (error) {
+            console.error(`[DEBUG] Error fetching product details page for ASIN ${asin}:`, error);
+            return null;
+        }
+    }
+
+    async function fetchAodMainProductDetailsPage(asin) {
+        const aodMainProductDetailsUrl = `https://www.amazon.com/gp/product/ajax/ref=dp_aod_ALL_mbc?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&experienceId=aodAjaxMain`;
+        console.log(`[DEBUG] Fetching AOD Main Product Details page: ${aodMainProductDetailsUrl}`);
+
+        try {
+            const response = await fetch(aodMainProductDetailsUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} for AOD Main Product Details page URL: ${aodMainProductDetailsUrl}`);
+            }
+            const aodMainProductDetailsHtml = await response.text();
+            console.log(`[DEBUG] AOD Main Product Details page fetched successfully for ASIN: ${asin}`);
+            return aodMainProductDetailsHtml;
+        } catch (error) {
+            console.error(`[DEBUG] Error fetching AOD Main Product Details page for ASIN ${asin}:`, error);
+            return null;
+        }
+    }
+
+    async function fetchAodSellerInfoPage(asin, pageNumber = 1) {
+        const aodSellerInfoUrl = `https://www.amazon.com/gp/product/ajax/ref=aod_page_${pageNumber}?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&isonlyrenderofferlist=true&pageno=${pageNumber}&experienceId=aodAjaxMain`;
+        console.log(`[DEBUG] Fetching AOD Seller Info page ${pageNumber}: ${aodSellerInfoUrl}`);
+
+        try {
+            const response = await fetch(aodSellerInfoUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} for AOD Seller Info page ${pageNumber} URL: ${aodSellerInfoUrl}`);
+            }
+            const aodSellerInfoHtml = await response.text();
+            console.log(`[DEBUG] AOD Seller Info page ${pageNumber} fetched successfully for ASIN: ${asin}`);
+            return aodSellerInfoHtml;
+        } catch (error) {
+            console.error(`[DEBUG] Error fetching AOD Seller Info page ${pageNumber} for ASIN ${asin}:`, error);
+            return null;
+        }
+    }
+
 
     async function fetchAllReviewTypesForAsin(asin) {
         console.log(`Fetching all review types for ASIN: ${asin}`);
-        const allReviews = await fetchReviewPage(asin, 'all');
-        const criticalReviews = await fetchReviewPage(asin, 'critical');
-        return { allReviews, criticalReviews };
-    }
+        const allReviewsData = await fetchReviewPage(asin, 'all');
+        const criticalReviewsData = await fetchReviewPage(asin, 'critical');
 
+        return {
+            allReviews: allReviewsData.accumulatedReviews,
+            criticalReviews: criticalReviewsData.accumulatedReviews,
+            reviewHtml: allReviewsData.reviewHtml
+        };
+    }
 
     async function processAsin(asin) {
         console.log(`Processing ASIN: ${asin}`);
         const reviewData = await fetchAllReviewTypesForAsin(asin);
         const allReviews = reviewData.allReviews;
         const criticalReviews = reviewData.criticalReviews;
+        const reviewHtml = reviewData.reviewHtml;
 
+        const productDetailsHtml = await fetchProductDetailsPage(asin);
+        const aodMainProductDetailsHtml = await fetchAodMainProductDetailsPage(asin);
+        const aodSellerInfoHtml = await fetchAodSellerInfoPage(asin);
 
-        if (allReviews && allReviews.length > 0 || criticalReviews && criticalReviews.length > 0) {
-            console.log(`Sending reviews to server for ASIN: ${asin}`);
-            await sendReviewsToServer(asin, allReviews, criticalReviews);
+        if ((allReviews && allReviews.length > 0) || (criticalReviews && criticalReviews.length > 0) || productDetailsHtml || reviewHtml || aodMainProductDetailsHtml || aodSellerInfoHtml) {
+            console.log(`Sending reviews and product details to server for ASIN: ${asin}`);
+            await sendReviewsToServer(asin, allReviews, criticalReviews, productDetailsHtml, reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml);
         } else {
-            console.log(`No reviews found or fetched for ASIN: ${asin}`);
+            console.log(`No reviews or product details found or fetched for ASIN: ${asin}`);
         }
     }
-
 
     function main() {
         const asins = extractAsins();
         console.log("Extracted ASINs:", asins);
 
         if (asins.length > 0) {
-            console.log("Fetching and sending review pages to server...");
-            // --- DEBUG: Test with ONE ASIN and ONE review type ---
-            // processAsin(asins[0]); // Uncomment to test only the first ASIN
-            // fetchReviewPage(asins[0], 'critical'); // Uncomment to test critical reviews for the first ASIN
-
-            asins.forEach(asin => { // Process all ASINs normally
+            console.log("Fetching and sending review pages and product details to server...");
+            asins.forEach(asin => {
                 processAsin(asin);
             });
         } else {
