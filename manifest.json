@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Amazon Review Scraper",
+  "version": "1.0",
+  "description": "Scrapes Amazon product reviews and stores them.",
+  "permissions": [
+      "storage",
+      "activeTab",
+      "scripting",
+      "tabs",
+  "webRequest"
+  ],
+ "host_permissions": [
+   "https://*.amazon.com/*"
+ ],
+  "background": {
+      "service_worker": "background.js"
+  },
+  "action": {
+      "default_popup": "popup.html"
+  },
+ "content_scripts": [
+  {
+    "matches": ["https://*.amazon.com/s*"],
+    "js": ["content_search.js","content_features.js"],
+  "run_at": "document_idle"
+  },
+ {
+    "matches": ["https://www.amazon.com/dp/*"], // NEW MATCH PATTERN!
+    "js": ["content_detail.js"],  // NEW CONTENT SCRIPT
+  "run_at": "document_idle"
+  }
+]
+}
