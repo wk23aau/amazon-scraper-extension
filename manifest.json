@@ -1,34 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "Amazon Review Scraper",
+  "name": "Amazon ASIN and Review Extractor",
   "version": "1.0",
-  "description": "Scrapes Amazon product reviews and stores them.",
+  "description": "Extracts ASINs from Amazon search and fetches product review pages.",
   "permissions": [
-      "storage",
-      "activeTab",
-      "scripting",
-      "tabs",
-  "webRequest"
+    "activeTab",
+    "scripting",
+    "webRequest"
   ],
- "host_permissions": [
-   "https://*.amazon.com/*"
- ],
-  "background": {
-      "service_worker": "background.js"
-  },
-  "action": {
-      "default_popup": "popup.html"
-  },
- "content_scripts": [
-  {
-    "matches": ["https://*.amazon.com/s*"],
-    "js": ["content_search.js","content_features.js"],
-  "run_at": "document_idle"
-  },
- {
-    "matches": ["https://www.amazon.com/dp/*"], // NEW MATCH PATTERN!
-    "js": ["content_detail.js"],  // NEW CONTENT SCRIPT
-  "run_at": "document_idle"
-  }
-]
+  "host_permissions": [
+    "https://www.amazon.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.amazon.com/s?i=mobile&rh=n%3A7072561011&s=popularity-rank&fs=true"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
 }
