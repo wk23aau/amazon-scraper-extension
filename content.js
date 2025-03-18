@@ -12,65 +12,88 @@
     /********************************************************************
      * 2. STYLES - Reusable styles for UI elements
      ********************************************************************/
+
     const floatingContainerStyles = {
         position: "fixed",
         bottom: "20px",
         right: "20px",
-        zIndex: "999999",    // Large zIndex to be on top
-        background: "#fff", // White background - cleaner
-        border: "1px solid #ccc", // Lighter border
-        padding: "15px", // Slightly more padding
-        borderRadius: "5px", // Softer rounded corners
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", // More modern font
-        boxShadow: "0 2px 5px rgba(0,0,0,0.15)" // Softer shadow
+        zIndex: "999999",
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        padding: "18px",
+        borderRadius: "12px",
+        fontFamily: "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+        width: "280px",
+        transition: "box-shadow 0.3s ease-in-out"
     };
-  
+    
     const titleStyles = {
-        fontWeight: "bold",
-        marginBottom: "10px", // More margin below title
-        fontSize: "1.1em" // Slightly larger title font
+        fontWeight: "600",
+        marginBottom: "12px",
+        fontSize: "1.1rem",
+        color: "#111827",
+        borderBottom: "1px solid #f3f4f6",
+        paddingBottom: "6px"
     };
-  
+    
     const statusStyles = {
-        marginBottom: "8px", // Adjusted margin
-        fontSize: "0.95em" // Slightly smaller status font
+        marginBottom: "10px",
+        fontSize: "0.95rem",
+        color: "#374151",
     };
-  
+    
     const progressStyles = {
-        marginBottom: "10px", // Adjusted margin
-        fontSize: "0.95em" // Slightly smaller progress font
+        marginBottom: "12px",
+        fontSize: "0.9rem",
+        color: "#4b5563",
+        maxHeight: "200px",
+        overflowY: "auto",
+        scrollbarWidth: "thin",
+        scrollbarColor: "#d1d5db #f9fafb"
     };
-  
+    
+    // Buttons Base
     const buttonBaseStyle = {
-        padding: "8px 12px",
-        marginRight: "5px",
+        padding: "8px 14px",
         border: "none",
-        borderRadius: "4px",
+        borderRadius: "6px",
         cursor: "pointer",
-        color: "#fff",
-        fontSize: "0.9em"
+        fontSize: "0.9rem",
+        fontWeight: "500",
+        transition: "transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease",
+        marginRight: "6px"
     };
-  
+    
+    // Button Styles
     const startButtonStyle = {
-        backgroundColor: "#28a745" // Green for Start
+        backgroundColor: "#10b981", // emerald green
+        color: "#fff"
     };
     const startButtonHoverStyle = {
-        backgroundColor: "#218838" // Darker green on hover
+        backgroundColor: "#059669",
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 12px rgba(5,150,105,0.3)"
     };
-  
+    
     const pauseButtonStyle = {
-        backgroundColor: "#ffc107", // Yellow for Pause
-        color: "#212529" // Dark text for yellow button
+        backgroundColor: "#f59e0b", // amber
+        color: "#fff"
     };
     const pauseButtonHoverStyle = {
-        backgroundColor: "#ffca2c" // Lighter yellow on hover
+        backgroundColor: "#d97706",
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 12px rgba(217,119,6,0.3)"
     };
-  
+    
     const stopButtonStyle = {
-        backgroundColor: "#dc3545" // Red for Stop
+        backgroundColor: "#ef4444", // red
+        color: "#fff"
     };
     const stopButtonHoverStyle = {
-        backgroundColor: "#c82333" // Darker red on hover
+        backgroundColor: "#dc2626",
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 12px rgba(220,38,38,0.3)"
     };
   
   
@@ -79,6 +102,23 @@
      ********************************************************************/
     // Create floating buttons container
     const floatingContainer = document.createElement("div");
+    const scrollbarStyles = `
+        #amazonScraperFloatingUI::-webkit-scrollbar {
+            width: 6px;
+        }
+        #amazonScraperFloatingUI::-webkit-scrollbar-track {
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+        #amazonScraperFloatingUI::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 6px;
+        }
+        `;
+
+const styleEl = document.createElement('style');
+styleEl.textContent = scrollbarStyles;
+document.head.appendChild(styleEl);
     Object.assign(floatingContainer.style, floatingContainerStyles); // Apply container styles
     floatingContainer.id = "amazonScraperFloatingUI";
   
@@ -399,7 +439,7 @@
   
   
         return `
-            <details style="margin-bottom: 8px; border: 1px solid #eee; padding: 8px; border-radius: 4px;">
+            <details style="margin-bottom:8px;border:1px solid #f3f4f6;background:#fafafa;padding:10px;border-radius:8px;">
                 <summary style="font-size: 0.95em; font-weight: bold; color: ${statusColor}; cursor: pointer; list-style: none;">
                     ASIN: ${asin} - Status: ${summaryStatus} <span style="font-weight: normal; color: #777;">(Click to expand)</span>
                 </summary>
