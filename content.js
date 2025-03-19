@@ -14,10 +14,6 @@
     let currentAsinIndex = 0;
     let currentReviewIndex = 0;
 
-    // We'll no longer use a fixed sampleReviews array—instead, use reviews collected for each ASIN.
-    // For fallback during development, you can uncomment the line below:
-    // const sampleReviews = [ "Review 1", "Review 2", "Review 3", "Review 4", "Review 5" ];
-
     // Chart data (for the carousel comparison chart)
     const chartData = {
         labels: [], // e.g., ["Review 1", "Review 2", ...]
@@ -139,48 +135,6 @@
         console.log(`Server response for ASIN ${asin}:`, data);
     }
 
-    async function analyzeSingleReview(text) {
-        const url = "http://localhost:3000/analyze-review";
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
-        });
-        if (!res.ok) throw new Error(`Analyze error: ${res.status}`);
-        const analysis = await res.json();
-        updateAnalysisUI(analysis);
-        return analysis;
-    }
-
-    async function analyzeSentiment(reviewsTextArray) {
-        const url = "http://localhost:3000/batch-evaluate";
-        const samples = reviewsTextArray.map(text => ({ text, label: 1 }));
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ samples })
-        });
-        if (!res.ok) throw new Error(`Batch evaluation error: ${res.status}`);
-        const result = await res.json();
-        return result;
-    }
-
-    function updateAnalysisUI(analysis) {
-        const bertLabelEl = document.getElementById("bertLabel");
-        const bertConfidenceEl = document.getElementById("bertConfidence");
-        const lrLabelEl = document.getElementById("lrLabel");
-        const lrConfidenceEl = document.getElementById("lrConfidence");
-        if (analysis && analysis.bert && analysis.lr) {
-            bertLabelEl.textContent = `Prediction: ${analysis.bert.label} (${analysis.bert.confidence.toFixed(1)}%)`;
-            bertConfidenceEl.style.width = analysis.bert.confidence + "%";
-            lrLabelEl.textContent = `Prediction: ${analysis.lr.label} (${analysis.lr.confidence.toFixed(1)}%)`;
-            lrConfidenceEl.style.width = analysis.lr.confidence + "%";
-        } else {
-            bertLabelEl.textContent = "Prediction: N/A";
-            lrLabelEl.textContent = "Prediction: N/A";
-        }
-    }
-
     /********************************************************************
      * 4. UI CREATION
      ********************************************************************/
@@ -236,53 +190,15 @@
     controlContainer.appendChild(analyzeReviewsBtn);
     controlContainer.appendChild(analyzeCriticalBtn);
     controlContainer.appendChild(analyzeAllBtn);
+
+    analyzeReviewsBtn.style.display = "none"; // Hide analyze buttons
+    analyzeCriticalBtn.style.display = "none"; // Hide analyze buttons
+    analyzeAllBtn.style.display = "none";     // Hide analyze buttons
+
     document.body.appendChild(controlContainer);
     makeDraggable(controlContainer);
 
-    // --- Analysis UI (Single Review) ---
-    const analysisContainer = document.createElement("div");
-    analysisContainer.id = "analysisContainer";
-    Object.assign(analysisContainer.style, {
-        position: "fixed",
-        bottom: "20px",
-        left: "20px",
-        width: "350px",
-        background: "#ffffff",
-        borderRadius: "16px",
-        boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
-        overflow: "hidden",
-        zIndex: "1000",
-        fontFamily: "'Inter', sans-serif"
-    });
-    analysisContainer.innerHTML = `
-      <div style="padding:14px; background:#4f46e5; color:#fff; font-weight:600; font-size:16px; cursor:move;">
-        AI Comparative Analysis 🤖
-      </div>
-      <div style="padding:14px; overflow-y:auto; max-height:480px;">
-        <div style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
-          <div><strong>Transformer (BERT)</strong></div>
-          <div id="bertLabel">Prediction: N/A</div>
-          <div style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; margin-top:4px; overflow:hidden;">
-            <div id="bertConfidence" style="height:100%; width:0%; background:#10b981;"></div>
-          </div>
-        </div>
-        <div style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
-          <div><strong>Logistic Regression</strong></div>
-          <div id="lrLabel">Prediction: N/A</div>
-          <div style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; margin-top:4px; overflow:hidden;">
-            <div id="lrConfidence" style="height:100%; width:0%; background:#ef4444;"></div>
-          </div>
-        </div>
-        <div style="margin-top:10px;">
-          <input id="analysisInput" type="text" placeholder="Enter review text" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ccc; border-radius:4px;">
-          <button id="analyzeBtn" style="width:100%; padding:8px; background:#6366f1; color:#fff; border:none; border-radius:6px; cursor:pointer;">Analyze Review</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(analysisContainer);
-    makeDraggable(analysisContainer);
-
-    // --- Confusion Matrix Widget ---
+    // --- Metrics Widget ---
     const matrixContainer = document.createElement("div");
     matrixContainer.id = "matrixContainer";
     Object.assign(matrixContainer.style, {
@@ -300,68 +216,52 @@
     });
     matrixContainer.innerHTML = `
       <div style="background:#6366f1; color:#fff; padding:12px; border-radius:8px; font-weight:600; text-align:center; margin-bottom:16px;">
-        Confusion Matrix 🔢
+        ASIN Progress
       </div>
-      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
-        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-          <div style="color:#6b7280; font-size:13px;">True Positive</div>
-          <div id="tp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-        </div>
-        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-          <div style="color:#6b7280; font-size:13px;">False Positive</div>
-          <div id="fp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-        </div>
-        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-          <div style="color:#6b7280; font-size:13px;">False Negative</div>
-          <div id="fn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-        </div>
-        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-          <div style="color:#6b7280; font-size:13px;">True Negative</div>
-          <div id="tn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-        </div>
-      </div>
+      <div id="metricsDisplay" style="font-size:14px; color:#374151;"></div>
     `;
     document.body.appendChild(matrixContainer);
     makeDraggable(matrixContainer);
 
-    // --- Carousel / Comparison Chart UI ---
-    const carouselContainer = document.createElement("div");
-    carouselContainer.id = "carouselContainer";
-    Object.assign(carouselContainer.style, {
-        position: "fixed",
-        bottom: "290px",
-        left: "20px",
-        width: "650px",
-        height: "320px",
-        background: "#ffffff",
-        borderRadius: "14px",
-        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-        overflow: "hidden",
-        zIndex: "999"
+    // --- Progress Chart UI (for ASIN progress) ---
+    const progressChartContainer = document.createElement("div");
+    progressChartContainer.id = "progressChartContainer";
+    Object.assign(progressChartContainer.style, {
+      position: "fixed",
+      bottom: "20px",
+      right: "320px",
+      width: "300px",
+      height: "300px",
+      background: "#ffffff",
+      borderRadius: "16px",
+      boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+      zIndex: "1000",
+      fontFamily: "'Inter', sans-serif",
+      padding: "10px"
     });
-    carouselContainer.innerHTML = `
-      <div id="reviewText" style="height:70px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#374151; margin-bottom:10px; cursor:move;">
-        <!-- Placeholder; will be updated with collected reviews -->
-      </div>
-      <canvas id="comparisonChart" style="max-height:180px;"></canvas>
-      <div style="display:flex; justify-content:space-between; padding:0 12px 12px;">
-        <button id="prevReviewBtn">← Prev</button>
-        <button id="nextReviewBtn">Next →</button>
-      </div>
-    `;
-    document.body.appendChild(carouselContainer);
-    makeDraggable(carouselContainer);
+    progressChartContainer.innerHTML = `<canvas id="progressChart" style="width:100%; height:100%;"></canvas>`;
+    document.body.appendChild(progressChartContainer);
+    makeDraggable(progressChartContainer);
 
-    // Initialize Chart.js chart
-    const ctx = document.getElementById("comparisonChart").getContext("2d");
-    const comparisonChart = new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { y: { suggestedMin: 0, suggestedMax: 100 } }
+    // Create a doughnut chart to display progress for current page (ASIN progress)
+    const progressCtx = document.getElementById("progressChart").getContext("2d");
+    const progressChartData = {
+      labels: ["Completed", "Pending", "Errors"],
+      datasets: [{
+        data: [0, 0, 0],
+        backgroundColor: ["#10b981", "#f59e0b", "#ef4444"]
+      }]
+    };
+    const progressChart = new Chart(progressCtx, {
+      type: "doughnut",
+      data: progressChartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom" }
         }
+      }
     });
 
     /********************************************************************
@@ -373,64 +273,10 @@
     analyzeReviewsBtn.addEventListener("click", handleBatchAnalyze); // Batch for current ASIN
     analyzeCriticalBtn.addEventListener("click", () => handleAnalyzeButtonClick("critical"));
     analyzeAllBtn.addEventListener("click", handleAnalyzeAll);
-    document.getElementById("analyzeBtn").addEventListener("click", () => {
-        const text = document.getElementById("analysisInput").value.trim();
-        if (!text) {
-            alert("Please enter a review text to analyze.");
-            return;
-        }
-        analyzeSingleReview(text)
-            .then(analysis => updateAnalysisUI(analysis))
-            .catch(err => console.error(err));
-    });
-    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
-    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
 
     /********************************************************************
      * 6. SINGLE & BATCH ANALYSIS FUNCTIONS
      ********************************************************************/
-    async function analyzeSingleReview(text) {
-        const url = "http://localhost:3000/analyze-review";
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
-        });
-        if (!res.ok) throw new Error(`Analyze error: ${res.status}`);
-        const analysis = await res.json();
-        updateAnalysisUI(analysis);
-        return analysis;
-    }
-
-    async function analyzeSentiment(reviewsTextArray) {
-        const url = "http://localhost:3000/batch-evaluate";
-        const samples = reviewsTextArray.map(text => ({ text, label: 1 }));
-        const res = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ samples })
-        });
-        if (!res.ok) throw new Error(`Batch evaluation error: ${res.status}`);
-        const result = await res.json();
-        return result;
-    }
-
-    function updateAnalysisUI(analysis) {
-        const bertLabelEl = document.getElementById("bertLabel");
-        const bertConfidenceEl = document.getElementById("bertConfidence");
-        const lrLabelEl = document.getElementById("lrLabel");
-        const lrConfidenceEl = document.getElementById("lrConfidence");
-        if (analysis && analysis.bert && analysis.lr) {
-            bertLabelEl.textContent = `Prediction: ${analysis.bert.label} (${analysis.bert.confidence.toFixed(1)}%)`;
-            bertConfidenceEl.style.width = analysis.bert.confidence + "%";
-            lrLabelEl.textContent = `Prediction: ${analysis.lr.label} (${analysis.lr.confidence.toFixed(1)}%)`;
-            lrConfidenceEl.style.width = analysis.lr.confidence + "%";
-        } else {
-            bertLabelEl.textContent = "Prediction: N/A";
-            lrLabelEl.textContent = "Prediction: N/A";
-        }
-    }
-
     async function handleBatchAnalyze() {
         // Batch analyze reviews for the current ASIN
         if (asinQueue.length === 0) {
@@ -445,12 +291,7 @@
         }
         const reviewsArray = asinData.allReviews.map(r => r.body).filter(Boolean);
         try {
-            const result = await analyzeSentiment(reviewsArray);
-            console.log("Batch evaluation result:", result);
-            if (result.metrics_bert && result.metrics_bert.confusion_matrix) {
-                const cm = result.metrics_bert.confusion_matrix;
-                updateConfusionMatrix(cm[1][1], cm[0][1], cm[1][0], cm[0][0]);
-            }
+            console.log("Batch analysis placeholder - analysis functions are disabled.");
         } catch (error) {
             console.error("Error during batch analysis:", error);
             alert("Failed batch analysis.");
@@ -470,12 +311,7 @@
             return;
         }
         try {
-            const result = await analyzeSentiment(allReviews);
-            console.log("Batch evaluation (all) result:", result);
-            if (result.metrics_bert && result.metrics_bert.confusion_matrix) {
-                const cm = result.metrics_bert.confusion_matrix;
-                updateConfusionMatrix(cm[1][1], cm[0][1], cm[1][0], cm[0][0]);
-            }
+            console.log("Analyze all reviews placeholder - analysis functions are disabled.");
         } catch (error) {
             console.error("Error during analyze all:", error);
             alert("Failed batch analysis for all reviews.");
@@ -483,99 +319,8 @@
     }
 
     function handleAnalyzeButtonClick(reviewType) {
-        alert(`Placeholder: analyzing ${reviewType} reviews...`);
+        alert(`Placeholder: analyzing ${reviewType} reviews... analysis functions are disabled.`);
     }
-
-    /********************************************************************
-     * 16. CAROUSEL & CHART UPDATE FUNCTIONS
-     ********************************************************************/
-    // Update the carousel using reviews from scrapedReviewData for the current ASIN.
-    function updateCarouselForCurrentReview(analysis) {
-        const reviewTextEl = document.getElementById("reviewText");
-        const currentAsin = asinQueue[currentAsinIndex];
-        const asinData = scrapedReviewData[currentAsin];
-        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
-            reviewTextEl.textContent = "No reviews for current ASIN.";
-            return;
-        }
-        const review = asinData.allReviews[currentReviewIndex];
-        reviewTextEl.textContent = review ? `"${review.body}"` : "No review text available.";
-
-        const reviewLabel = `Review ${currentReviewIndex + 1}`;
-        if (currentReviewIndex === chartData.labels.length) {
-            chartData.labels.push(reviewLabel);
-            chartData.datasets[0].data.push(analysis.bert.confidence);
-            chartData.datasets[1].data.push(analysis.lr.confidence);
-        } else {
-            chartData.labels[currentReviewIndex] = reviewLabel;
-            chartData.datasets[0].data[currentReviewIndex] = analysis.bert.confidence;
-            chartData.datasets[1].data[currentReviewIndex] = analysis.lr.confidence;
-            while (chartData.labels.length > currentReviewIndex + 1) {
-                chartData.labels.pop();
-                chartData.datasets[0].data.pop();
-                chartData.datasets[1].data.pop();
-            }
-        }
-        comparisonChart.update();
-    }
-
-    async function nextReview() {
-        if (asinQueue.length === 0) return;
-        const currentAsin = asinQueue[currentAsinIndex];
-        const asinData = scrapedReviewData[currentAsin];
-        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
-            alert("No reviews for current ASIN.");
-            return;
-        }
-        if (currentReviewIndex < asinData.allReviews.length - 1) {
-            currentReviewIndex++;
-        } else {
-            if (currentAsinIndex < asinQueue.length - 1) {
-                currentAsinIndex++;
-                currentReviewIndex = 0;
-            } else {
-                alert("No more reviews available.");
-                return;
-            }
-        }
-        try {
-            const analysis = await analyzeSingleReview(asinData.allReviews[currentReviewIndex].body);
-            updateCarouselForCurrentReview(analysis);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    async function prevReview() {
-        if (asinQueue.length === 0) return;
-        const currentAsin = asinQueue[currentAsinIndex];
-        const asinData = scrapedReviewData[currentAsin];
-        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
-            alert("No reviews for current ASIN.");
-            return;
-        }
-        if (currentReviewIndex > 0) {
-            currentReviewIndex--;
-        } else {
-            if (currentAsinIndex > 0) {
-                currentAsinIndex--;
-                const prevAsinData = scrapedReviewData[asinQueue[currentAsinIndex]];
-                currentReviewIndex = (prevAsinData && prevAsinData.allReviews && prevAsinData.allReviews.length > 0) ? prevAsinData.allReviews.length - 1 : 0;
-            } else {
-                alert("Already at the first review of the first ASIN.");
-                return;
-            }
-        }
-        try {
-            const analysis = await analyzeSingleReview(asinData.allReviews[currentReviewIndex].body);
-            updateCarouselForCurrentReview(analysis);
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
-    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
-    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
 
     /********************************************************************
      * 17. SCRAPER LOOP & PROGRESS UPDATE
@@ -593,6 +338,8 @@
             progressDisplay.innerHTML = "All ASINs processed. Scraping complete.";
             analyzeReviewsBtn.disabled = false;
             analyzeCriticalBtn.disabled = false;
+            // After finishing current page scraping, automatically navigate if a next page exists:
+            goToNextPage();
         }
     }
 
@@ -649,39 +396,88 @@
         }
         if (scraperState !== "running") return;
         updateProgressForAsin(asin, "sending-to-server");
-        try {
-            await sendReviewsToServer(
-                asin,
-                allReviewsData.accumulatedReviews,
-                criticalReviewsData.accumulatedReviews,
-                productDetailsHtml,
-                allReviewsData.reviewHtml,
-                aodMainProductDetailsHtml,
-                aodSellerInfoHtml
-            );
+        // Non-blocking server push so fetching remains concurrent:
+        sendReviewsToServer(
+            asin,
+            allReviewsData.accumulatedReviews,
+            criticalReviewsData.accumulatedReviews,
+            productDetailsHtml,
+            allReviewsData.reviewHtml,
+            aodMainProductDetailsHtml,
+            aodSellerInfoHtml
+        ).then(() => {
             updateProgressForAsin(asin, "done", true);
             scrapedReviewData[asin] = {
                 allReviews: allReviewsData.accumulatedReviews,
                 criticalReviews: criticalReviewsData.accumulatedReviews
             };
-        } catch (error) {
+        }).catch(error => {
             updateProgressForAsin(asin, "serverError", error.message);
-        }
+        });
     }
 
     function updateOverallProgressUI() {
-        let completedCount = 0, errorCount = 0, analysisCount = 0;
+        let completedCount = 0;
+        let errorCount = 0;
+        let inProgressCount = 0;
         Object.keys(progressData).forEach(asin => {
-            if (progressData[asin].done) completedCount++;
-            else if (progressData[asin].detailsError || progressData[asin].serverError) errorCount++;
-            if (progressData[asin].analysisAllDone || progressData[asin].analysisCriticalDone) analysisCount++;
+            const data = progressData[asin];
+            // For overall count, we count an ASIN as complete if the server push ("done") is true.
+            if (data.done) {
+              completedCount++;
+            } else if (data.detailsError || data.serverError) {
+              errorCount++;
+            } else {
+              inProgressCount++;
+            }
         });
+        const totalScraped = asinQueue.length;
         progressDisplay.innerHTML = `
-        <p>Status: ${scraperState}</p>
-        <p>Scraped: ${completedCount} / ${asinQueue.length}</p>
-        <p>Analyzed: ${analysisCount} / ${asinQueue.length}</p>
-        <p>Errors: ${errorCount}</p>
-      `;
+            <p>Status: ${scraperState}</p>
+            <p>Scraped: ${completedCount} / ${totalScraped}</p>
+            <p>Errors: ${errorCount}</p>
+        `;
+        const metricsDisplay = document.getElementById("metricsDisplay");
+        if (metricsDisplay) {
+            metricsDisplay.innerHTML = `
+              <p><strong>Currently Scraping:</strong> ${inProgressCount}</p>
+              <p><strong>Total Scraped:</strong> ${totalScraped}</p>
+              <p><strong>Total Successful:</strong> ${completedCount}</p>
+              <p><strong>Total Failed:</strong> ${errorCount}</p>
+            `;
+        }
+        updateProgressChart();
+    }
+
+    // Incremental progress chart update: count six steps per ASIN
+    function updateProgressChart() {
+        const stepsPerAsin = 6; // details, aodMain, aodSeller, allReviews, criticalReviews, server push ("done")
+        const totalSteps = asinQueue.length * stepsPerAsin;
+        let completedSteps = 0;
+        let errorSteps = 0;
+        Object.keys(progressData).forEach(asin => {
+            const data = progressData[asin];
+            if(data.detailsDone === true) completedSteps++;
+            else if(data.detailsError) errorSteps++;
+
+            if(data.aodMainDone === true) completedSteps++;
+            else if(data.aodMainError) errorSteps++;
+
+            if(data.aodSellerDone === true) completedSteps++;
+            else if(data.aodSellerError) errorSteps++;
+
+            if(data.allReviewsDone === true) completedSteps++;
+            else if(data.allReviewsError) errorSteps++;
+
+            if(data.criticalReviewsDone === true) completedSteps++;
+            else if(data.criticalReviewsError) errorSteps++;
+
+            if(data.done === true) completedSteps++;
+            else if(data.serverError) errorSteps++;
+        });
+        const pendingSteps = totalSteps - completedSteps - errorSteps;
+        progressChart.data.datasets[0].data = [completedSteps, pendingSteps, errorSteps];
+        progressChart.update();
     }
 
     function updateProgressForAsin(asin, step, value = null) {
@@ -691,29 +487,7 @@
     }
 
     /********************************************************************
-     * 18. EVENT LISTENER ATTACHMENTS
-     ********************************************************************/
-    startBtn.addEventListener("click", handleStartButtonClick);
-    pauseBtn.addEventListener("click", handlePauseButtonClick);
-    stopBtn.addEventListener("click", handleStopButtonClick);
-    analyzeReviewsBtn.addEventListener("click", handleBatchAnalyze);
-    analyzeCriticalBtn.addEventListener("click", () => handleAnalyzeButtonClick("critical"));
-    analyzeAllBtn.addEventListener("click", handleAnalyzeAll);
-    document.getElementById("analyzeBtn").addEventListener("click", () => {
-        const text = document.getElementById("analysisInput").value.trim();
-        if (!text) {
-            alert("Please enter a review text to analyze.");
-            return;
-        }
-        analyzeSingleReview(text)
-            .then(analysis => updateAnalysisUI(analysis))
-            .catch(err => console.error(err));
-    });
-    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
-    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
-
-    /********************************************************************
-     * 15. SCRAPER CONTROL HANDLERS
+     * 18. SCRAPER CONTROL HANDLERS
      ********************************************************************/
     async function handleStartButtonClick() {
         if (scraperState === "running") return;
@@ -781,7 +555,6 @@
     /********************************************************************
      * 9. UTILITY FUNCTIONS - Functional Logic
      ********************************************************************/
-    // A simple wait function for “pausing” loops (not used in this version but kept for potential future use)
     function wait(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -789,7 +562,6 @@
     async function fetchProductDetailsPage(asin) {
         const productDetailsUrl = `https://www.amazon.com/dp/${asin}/`;
         console.log(`[DEBUG] Fetching product details page: ${productDetailsUrl}`);
-
         try {
             const response = await fetch(productDetailsUrl);
             if (!response.ok) {
@@ -799,14 +571,13 @@
             return productDetailsHtml;
         } catch (error) {
             console.error(`[DEBUG] Error fetching product details for ASIN ${asin}:`, error);
-            throw error; // Re-throw to be caught in scrapeAsin
+            throw error;
         }
     }
 
     async function fetchAodMainProductDetailsPage(asin) {
         const aodMainProductDetailsUrl = `https://www.amazon.com/gp/product/ajax/ref=dp_aod_ALL_mbc?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&experienceId=aodAjaxMain`;
         console.log(`[DEBUG] Fetching AOD Main Product Details page: ${aodMainProductDetailsUrl}`);
-
         try {
             const response = await fetch(aodMainProductDetailsUrl);
             if (!response.ok) {
@@ -816,14 +587,13 @@
             return aodMainProductDetailsHtml;
         } catch (error) {
             console.error(`[DEBUG] Error fetching AOD Main Product Details for ASIN ${asin}:`, error);
-            throw error; // Re-throw
+            throw error;
         }
     }
 
     async function fetchAodSellerInfoPage(asin, pageNumber = 1) {
         const aodSellerInfoUrl = `https://www.amazon.com/gp/product/ajax/ref=aod_page_${pageNumber}?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&isonlyrenderofferlist=true&pageno=${pageNumber}&experienceId=aodAjaxMain`;
         console.log(`[DEBUG] Fetching AOD Seller Info page ${pageNumber}: ${aodSellerInfoUrl}`);
-
         try {
             const response = await fetch(aodSellerInfoUrl);
             if (!response.ok) {
@@ -833,7 +603,7 @@
             return aodSellerInfoHtml;
         } catch (error) {
             console.error(`[DEBUG] Error fetching AOD Seller Info for ASIN ${asin} - p${pageNumber}:`, error);
-            throw error; // Re-throw
+            throw error;
         }
     }
 
@@ -845,7 +615,6 @@
         if (!accumulatedReviews) {
             accumulatedReviews = [];
         }
-
         let currentPageNumber = 1;
         try {
             const urlParams = new URLSearchParams(new URL(pageUrl).search);
@@ -856,9 +625,7 @@
         } catch (error) {
             console.warn(`Could not parse pageNumber from URL: ${pageUrl}`, error);
         }
-
         console.log(`[DEBUG] START fetchReviewPage - ${reviewType} - Page ${currentPageNumber}`);
-
         try {
             const response = await fetch(pageUrl);
             if (!response.ok) {
@@ -867,24 +634,20 @@
             const reviewHtml = await response.text();
             const parsedReviews = parseReviewsFromHtmlFragment(reviewHtml);
             accumulatedReviews.push(...parsedReviews);
-
             console.log(
                 `[DEBUG] Parsed ${parsedReviews.length} ${reviewType} reviews from page ${currentPageNumber}, total: ${accumulatedReviews.length}`
             );
-
             const nextPageLinkHref = findNextPageLinkHrefFromFragment(reviewHtml);
             if (nextPageLinkHref) {
                 const nextPageUrl = new URL(nextPageLinkHref, pageUrl).href;
                 return fetchReviewPage(asin, reviewType, nextPageUrl, accumulatedReviews);
             } else {
-                console.log(
-                    `[DEBUG] No more ${reviewType} review pages. Total: ${accumulatedReviews.length}`
-                );
+                console.log(`[DEBUG] No more ${reviewType} review pages. Total: ${accumulatedReviews.length}`);
                 return { accumulatedReviews: accumulatedReviews, reviewHtml };
             }
         } catch (error) {
             console.error(`[DEBUG] ERROR in fetchReviewPage - ${reviewType}`, error);
-            throw error; // Re-throw
+            throw error;
         } finally {
             console.log(`[DEBUG] END fetchReviewPage - ${reviewType} - Page ${currentPageNumber}`);
         }
@@ -897,7 +660,6 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlFragment, "text/html");
         let reviews = [];
-
         const reviewElements = doc.querySelectorAll(
             '#cm_cr-review_list [data-hook="review"]'
         );
@@ -906,7 +668,6 @@
             review.reviewerName =
                 reviewElement.querySelector('[data-hook="review-author"]')?.textContent.trim() ??
                 null;
-
             const ratingElement = reviewElement.querySelector('[data-hook="review-star-rating"]');
             if (ratingElement) {
                 const ratingText = ratingElement.querySelector(".a-icon-alt").textContent.trim();
@@ -956,16 +717,30 @@
         return asins;
     }
 
-
     /********************************************************************
-     * 19. CONFUSION MATRIX UPDATE FUNCTION
+     * 20. PAGINATION FUNCTION
      ********************************************************************/
-    function updateConfusionMatrix(tp, fp, fn, tn) {
-        document.getElementById('tp').textContent = tp;
-        document.getElementById('fp').textContent = fp;
-        document.getElementById('fn').textContent = fn;
-        document.getElementById('tn').textContent = tn;
+    function goToNextPage() {
+        const nextPageLink = document.querySelector('.s-pagination-next:not(.s-pagination-disabled)');
+        if (nextPageLink) {
+            console.log("Navigating to next page via click:", nextPageLink);
+            nextPageLink.click(); // Trigger AJAX pagination
+            setTimeout(() => {
+                // Re-extract ASINs on the new page
+                asinQueue = extractAsins();
+                if (asinQueue.length > 0) {
+                    // Reset state for new page
+                    progressData = {};
+                    scrapedReviewData = {};
+                    statusDisplay.textContent = "Status: running on new page";
+                    runScraperLoop();
+                } else {
+                    console.log("No new ASINs found on the next page.");
+                }
+            }, 3000); // Adjust timeout as needed based on AJAX load time
+        } else {
+            console.log("No next page link found or next page is disabled.");
+        }
     }
-
 
 })();
