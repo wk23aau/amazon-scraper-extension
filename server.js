@@ -1,10 +1,10 @@
-// server.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const cors = require('cors');
 const cheerio = require('cheerio');
-const path = require('path'); // Need path module for file path manipulation
+const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
@@ -18,30 +18,22 @@ app.use(bodyParser.json({ limit: '50mb' }));
 let scrapeState = 'idle';  // 'idle', 'running', 'paused', 'stopped'
 let asinQueue = [];        // Holds a list of ASINs to scrape
 let currentIndex = 0;      // Which ASIN are we on?
-// Basic progress info: you can track as many details as you like:
 let progress = {
-  total: 0,            // total ASINs in the queue
-  completed: 0,        // how many ASINs have completed
-  currentAsin: null,   // which ASIN is being worked on right now
-  step: null,          // e.g. "scraping-details", "scraping-reviews", etc.
+  total: 0,
+  completed: 0,
+  currentAsin: null,
+  step: null,
 };
 
 /*********************************************************************
  * 1. CONTROL ENDPOINTS
  *********************************************************************/
-
-/**
- * POST /start-scrape
- * Body: { asins: ["B00XXXX", "B07YYYY", ...] }
- * - Resets the queue, sets state to 'running'.
- */
 app.post('/start-scrape', (req, res) => {
   if (!Array.isArray(req.body.asins) || req.body.asins.length === 0) {
     return res.status(400).json({
       error: 'Please provide a non-empty "asins" array in the request body.'
     });
   }
-
   asinQueue = req.body.asins;
   currentIndex = 0;
   scrapeState = 'running';
@@ -60,10 +52,6 @@ app.post('/start-scrape', (req, res) => {
   });
 });
 
-/**
- * POST /pause-scrape
- * - Sets state to 'paused'.
- */
 app.post('/pause-scrape', (req, res) => {
   if (scrapeState !== 'running') {
     return res.status(400).json({
@@ -75,10 +63,6 @@ app.post('/pause-scrape', (req, res) => {
   res.json({ message: 'Scraping paused', state: scrapeState });
 });
 
-/**
- * POST /stop-scrape
- * - Sets state to 'stopped'.
- */
 app.post('/stop-scrape', (req, res) => {
   scrapeState = 'stopped';
   console.log('[SERVER DEBUG] Scrape stopped by user.');
@@ -86,52 +70,38 @@ app.post('/stop-scrape', (req, res) => {
 });
 
 /*********************************************************************
- * 1.5. CHECK ASINS EXIST ENDPOINT (NEW)
- * POST /check-asins-exist
- * Body: { asins: ["B00XXXX", "B07YYYY", ...] }
- * - Checks which ASINs already have saved data on the server.
- */
+ * 1.5. CHECK ASINS EXIST ENDPOINT
+ *********************************************************************/
 app.post('/check-asins-exist', (req, res) => {
   if (!Array.isArray(req.body.asins) || req.body.asins.length === 0) {
     return res.status(400).json({
       error: 'Please provide a non-empty "asins" array in the request body.'
     });
   }
-
   const requestedAsins = req.body.asins;
   const existingAsins = [];
   const newAsins = [];
-
   if (!fs.existsSync('./review_data')) {
-    fs.mkdirSync('./review_data'); // Ensure directory exists even if empty
+    fs.mkdirSync('./review_data');
   }
-
   requestedAsins.forEach(asin => {
     const filenamePattern = `reviews_all_details_${asin}_all_critical_`;
     const reviewDataDir = './review_data';
-
     const existingFiles = fs.readdirSync(reviewDataDir).filter(file => file.startsWith(filenamePattern));
-
     if (existingFiles.length > 0) {
       existingAsins.push(asin);
     } else {
       newAsins.push(asin);
     }
   });
-
   res.json({
     existingAsins: existingAsins,
     newAsins: newAsins
   });
 });
 
-
 /*********************************************************************
  * 2. GET NEXT ASIN
- *    The content script can periodically call GET /next-asin
- *    (or poll) to see if there's an ASIN to process.
- *    If we are 'running' and have more ASINs, return the next one,
- *    then increment currentIndex on the server.
  *********************************************************************/
 app.get('/next-asin', (req, res) => {
   if (scrapeState !== 'running') {
@@ -141,8 +111,6 @@ app.get('/next-asin', (req, res) => {
       message: `Scraper not in 'running' state (current: ${scrapeState}).`,
     });
   }
-
-  // If we are past the end of the queue, set to 'idle'
   if (currentIndex >= asinQueue.length) {
     scrapeState = 'idle';
     return res.json({
@@ -151,27 +119,21 @@ app.get('/next-asin', (req, res) => {
       message: 'No more ASINs to scrape. Queue is complete.',
     });
   }
-
   const asin = asinQueue[currentIndex];
   progress.currentAsin = asin;
   progress.step = 'fetching';
   console.log(`[SERVER DEBUG] Providing next ASIN: ${asin}`);
-
   res.json({
     asin,
     state: scrapeState,
     index: currentIndex,
     total: asinQueue.length,
   });
-
-  // Move to the next index for the following request
   currentIndex++;
 });
 
 /*********************************************************************
  * 3. STATUS ENDPOINT
- *    The front-end can call GET /status to see the current
- *    scraping state, progress, which ASIN we’re on, etc.
  *********************************************************************/
 app.get('/status', (req, res) => {
   res.json({
@@ -184,11 +146,6 @@ app.get('/status', (req, res) => {
 
 /*********************************************************************
  * 4. RECEIVE RESULTS: /save-reviews
- *
- *    This is your original endpoint, with no changes needed for
- *    receiving and saving the data. We only added extra logs that
- *    update the server-side progress info, so we know we completed
- *    an ASIN.
  *********************************************************************/
 app.post('/save-reviews', async (req, res) => {
   const {
@@ -208,7 +165,7 @@ app.post('/save-reviews', async (req, res) => {
     !Array.isArray(allReviews) ||
     !Array.isArray(criticalReviews)
   ) {
-    console.error("[SERVER DEBUG] Invalid request body received (reviews part):", req.body);
+    console.error("[SERVER DEBUG] Invalid request body received:", req.body);
     return res.status(400).json({ error: 'Invalid request body. Expecting ASIN, allReviews, and criticalReviews arrays.' });
   }
 
@@ -222,53 +179,34 @@ app.post('/save-reviews', async (req, res) => {
   } else {
     console.log(`[SERVER DEBUG] No main product details HTML received for ASIN: ${asin}`);
   }
-
   if (aodMainProductDetailsHtml) {
     parsedAodMainProductDetails = parseAodMainProductDetailsHtml(aodMainProductDetailsHtml);
     console.log(`[SERVER DEBUG] Parsed AOD Main Product Details for ASIN: ${asin}`);
   } else {
     console.log(`[SERVER DEBUG] No AOD Main Product Details HTML received for ASIN: ${asin}`);
   }
-
   if (aodSellerInfoHtml) {
     parsedAodSellerInfo = parseAodSellerInfoHtml(aodSellerInfoHtml);
     console.log(`[SERVER DEBUG] Parsed AOD Seller Info for ASIN: ${asin}`);
   } else {
     console.log(`[SERVER DEBUG] No AOD Seller Info HTML received for ASIN: ${asin}`);
   }
-
   try {
     if (!fs.existsSync('./review_data')) {
       fs.mkdirSync('./review_data');
     }
-
     const timestamp = new Date().toISOString().replace(/[:T\-Z\.]/g, '_');
     const filename = `reviews_all_details_${asin}_all_critical_${timestamp}.json`;
     const filePath = `./review_data/${filename}`;
-    const rawReviewsFilename = `raw_reviews_${asin}_${timestamp}.html`;
-    const rawProductDetailsFilename = `raw_product_details_${asin}_${timestamp}.html`;
-    const rawAodMainProductDetailsFilename = `raw_aod_main_details_${asin}_${timestamp}.html`;
-    const rawAodSellerInfoFilename = `raw_aod_seller_info_${asin}_${timestamp}.html`;
 
-    const rawReviewsFilePath = `./review_data/${rawReviewsFilename}`;
-    const rawProductDetailsFilePath = `./review_data/${rawProductDetailsFilename}`;
-    const rawAodMainProductDetailsFilePath = `./review_data/${rawAodMainProductDetailsFilename}`;
-    const rawAodSellerInfoFilePath = `./review_data/${rawAodSellerInfoFilename}`;
-
-    console.log(`[SERVER DEBUG] Saving all data for ASIN ${asin} to ${filePath}. All Reviews Count: ${allReviews.length}, Critical Reviews Count: ${criticalReviews.length}`);
-    console.log(`[SERVER DEBUG] Saving raw reviews HTML for ASIN ${asin} to ${rawReviewsFilePath}`);
-    console.log(`[SERVER DEBUG] Saving raw product details HTML for ASIN ${asin} to ${rawProductDetailsFilePath}`);
-    console.log(`[SERVER DEBUG] Saving raw AOD Main Product Details HTML for ASIN ${asin} to ${rawAodMainProductDetailsFilePath}`);
-    console.log(`[SERVER DEBUG] Saving raw AOD Seller Info HTML for ASIN ${asin} to ${rawAodSellerInfoFilePath}`);
-
-    // Write JSON data
+    console.log(`[SERVER DEBUG] Saving data for ASIN ${asin} to ${filePath}.`);
     fs.writeFileSync(
       filePath,
       JSON.stringify(
         {
-          asin: asin,
-          allReviews: allReviews,
-          criticalReviews: criticalReviews,
+          asin,
+          allReviews,
+          criticalReviews,
           productDetails: parsedProductDetails,
           aodMainProductDetails: parsedAodMainProductDetails,
           aodSellerInfo: parsedAodSellerInfo
@@ -277,31 +215,22 @@ app.post('/save-reviews', async (req, res) => {
         2
       )
     );
+    // Save raw HTML files
+    fs.writeFileSync(`./review_data/raw_reviews_${asin}_${timestamp}.html`, reviewHtml);
+    fs.writeFileSync(`./review_data/raw_product_details_${asin}_${timestamp}.html`, productDetailsHtml);
+    fs.writeFileSync(`./review_data/raw_aod_main_details_${asin}_${timestamp}.html`, aodMainProductDetailsHtml);
+    fs.writeFileSync(`./review_data/raw_aod_seller_info_${asin}_${timestamp}.html`, aodSellerInfoHtml);
 
-    // Write raw HTML
-    fs.writeFileSync(rawReviewsFilePath, reviewHtml);
-    fs.writeFileSync(rawProductDetailsFilePath, productDetailsHtml);
-    fs.writeFileSync(rawAodMainProductDetailsFilePath, aodMainProductDetailsHtml);
-    fs.writeFileSync(rawAodSellerInfoFilePath, aodSellerInfoHtml);
-
-    console.log(`[SERVER DEBUG] Successfully saved all data for ASIN ${asin} to ${filePath}`);
-
-    // UPDATE PROGRESS: if this matches the current in-progress ASIN, we consider it "completed"
+    console.log(`[SERVER DEBUG] Successfully saved data for ASIN ${asin}.`);
     if (progress.currentAsin === asin) {
       progress.completed++;
       progress.step = 'done';
-      console.log(`[SERVER DEBUG] Marked ASIN ${asin} as completed. (Completed: ${progress.completed}/${progress.total})`);
+      console.log(`[SERVER DEBUG] Marked ASIN ${asin} as completed. (${progress.completed}/${progress.total})`);
     }
-
     res.json({
-      message: `All data for ASIN ${asin} saved successfully to ${filename}`,
-      filename: filename,
-      rawReviewsFilename: rawReviewsFilename,
-      rawProductDetailsFilename: rawProductDetailsFilename,
-      rawAodMainProductDetailsFilename: rawAodMainProductDetailsFilename,
-      rawAodSellerInfoFilename: rawAodSellerInfoFilename
+      message: `Data for ASIN ${asin} saved successfully.`,
+      filename
     });
-
   } catch (error) {
     console.error("[SERVER DEBUG] Error saving data to file:", error);
     res.status(500).json({ error: 'Error saving data to file.' });
@@ -309,9 +238,45 @@ app.post('/save-reviews', async (req, res) => {
 });
 
 /*********************************************************************
- * 5. PARSING FUNCTIONS (unchanged from original)
+ * 6. NEW ENDPOINT: /analyze-review
+ *    Forwards a single review text to Flask (/compare) and returns analysis.
  *********************************************************************/
-// ... (parsing functions - no changes) ...
+app.post('/analyze-review', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text || typeof text !== 'string') {
+      return res.status(400).json({ error: 'No valid "text" provided.' });
+    }
+    const flaskResponse = await axios.post('http://localhost:5000/compare', { text });
+    res.json(flaskResponse.data);
+  } catch (error) {
+    console.error("[SERVER DEBUG] Error calling Flask /compare:", error);
+    res.status(500).json({ error: "Failed to analyze text" });
+  }
+});
+
+/*********************************************************************
+ * 7. NEW ENDPOINT: /batch-evaluate
+ *    Forwards an array of labeled samples to Flask (/batch-compare) for batch metrics.
+ *********************************************************************/
+app.post('/batch-evaluate', async (req, res) => {
+  try {
+    const { samples } = req.body;
+    if (!Array.isArray(samples) || samples.length === 0) {
+      return res.status(400).json({ error: "No 'samples' array provided" });
+    }
+    const flaskResponse = await axios.post('http://localhost:5000/batch-compare', { samples });
+    res.json(flaskResponse.data);
+  } catch (error) {
+    console.error("[SERVER DEBUG] Error calling Flask /batch-compare:", error);
+    res.status(500).json({ error: 'Failed to retrieve batch metrics' });
+  }
+});
+
+/*********************************************************************
+ * 8. PARSING FUNCTIONS (Stub Implementations)
+ *    Replace these stubs with your actual parsing logic as needed.
+ *********************************************************************/
 function parseProductDetailsHtml(html) {
   console.log(`[SERVER DEBUG] START parseProductDetailsHtml`);
   const $ = cheerio.load(html);
@@ -737,7 +702,7 @@ function parseAodSellerInfoHtml(html) {
 
 
 /*********************************************************************
- * 6. START SERVER
+ * 9. START SERVER
  *********************************************************************/
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Comparative Analysis & Reviews Carousel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+    }
+
+    .widget-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+
+    .widget-header {
+      padding: 16px;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-body {
+      padding: 16px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .carousel-container {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      width: 650px;
+      height: 250px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .carousel-header {
+      background: #6366f1;
+      color: #fff;
+      padding: 12px;
+      font-weight: 500;
+    }
+
+    .carousel-content {
+      padding: 15px;
+      height: 180px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      text-align: center;
+      color: #374151;
+    }
+
+    .carousel-controls {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .carousel-btn {
+      background: #4f46e5;
+      border: none;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .carousel-btn:hover {
+      background: #4338ca;
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="widget-header">
+    <span>AI Comparative Analysis</span>
+    <span>🤖</span>
+  </div>
+
+  <div class="widget-body">
+    <!-- Existing AI Analysis content here -->
+    <p style="color:#6b7280;text-align:center;">[ AI Analysis Content ]</p>
+  </div>
+</div>
+
+<!-- Reviews Carousel -->
+<div class="carousel-container">
+  <div class="carousel-header">User Reviews</div>
+  <div class="carousel-content" id="review-content">
+    "This product is fantastic! It exceeded my expectations and I highly recommend it."
+  </div>
+  <div class="carousel-controls">
+    <button class="carousel-btn" onclick="prevReview()">&larr; Prev</button>
+    <button class="carousel-btn" onclick="nextReview()">Next &rarr;</button>
+  </div>
+</div>
+
+<script>
+const reviews = [
+  "This product is fantastic! It exceeded my expectations and I highly recommend it.",
+  "Delivery was slow, but the item quality is amazing. Worth the wait!",
+  "I’m disappointed. The product did not match the description.",
+  "Absolutely love it! Great value for the price.",
+  "Mediocre performance, expected more based on the reviews."
+];
+
+let currentReview = 0;
+
+function showReview(index) {
+  document.getElementById('review-content').textContent = reviews[index];
+}
+
+function nextReview() {
+  currentReview = (currentReview + 1) % reviews.length;
+  showReview(currentReview);
+}
+
+function prevReview() {
+  currentReview = (currentReview - 1 + reviews.length) % reviews.length;
+  showReview(currentReview);
+}
+
+// Initialize with first review
+showReview(currentReview);
+</script>
+
+</body>
+</html>

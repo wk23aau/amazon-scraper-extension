@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Comparative Analysis Widget</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+    }
+
+    /* Floating widget */
+    .widget-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .widget-header {
+      padding: 16px;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .widget-body {
+      padding: 16px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .model-card {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .model-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+    }
+
+    .model-name {
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+
+    .prediction-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      background: #e5e7eb;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: #10b981;
+      transition: width 0.5s ease;
+    }
+
+    .confidence-text {
+      font-size: 12px;
+      color: #9ca3af;
+      text-align: right;
+    }
+
+    /* Expandable details */
+    details {
+      margin-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 8px;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    details summary {
+      cursor: pointer;
+      color: #4f46e5;
+      font-weight: 500;
+    }
+
+    /* Placeholder charts */
+    .chart-placeholder {
+      background: #f3f4f6;
+      border: 2px dashed #d1d5db;
+      border-radius: 8px;
+      height: 150px;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    /* Button */
+    .analyze-btn {
+      padding: 10px 14px;
+      background: #10b981;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+
+    .analyze-btn:hover {
+      background: #059669;
+    }
+
+    /* Scrollbar styling */
+    .widget-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    .widget-body::-webkit-scrollbar-track {
+      background: #f9fafb;
+    }
+    .widget-body::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="widget-header">
+    <span>AI Comparative Analysis</span>
+    <span style="font-size:20px;">🤖</span>
+  </div>
+
+  <div class="widget-body">
+
+    <!-- Example Model Card 1 -->
+    <div class="model-card">
+      <div class="model-name">Transformer (BERT)</div>
+      <div class="prediction-label">Prediction: <strong>Positive 😊</strong></div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width: 88%;"></div>
+      </div>
+      <div class="confidence-text">Confidence: 88%</div>
+
+      <details>
+        <summary>View Explanation</summary>
+        <p><strong>Influential Tokens:</strong></p>
+        <ul>
+          <li>"excellent" (0.75)</li>
+          <li>"amazing" (0.65)</li>
+          <li>"slow" (-0.40)</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- Example Model Card 2 -->
+    <div class="model-card">
+      <div class="model-name">Logistic Regression</div>
+      <div class="prediction-label">Prediction: <strong>Negative 🙁</strong></div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width: 62%; background:#ef4444;"></div>
+      </div>
+      <div class="confidence-text">Confidence: 62%</div>
+
+      <details>
+        <summary>View Explanation</summary>
+        <p><strong>Top Features:</strong></p>
+        <ul>
+          <li>"slow" (-0.60)</li>
+          <li>"poor" (-0.45)</li>
+          <li>"disappointing" (-0.30)</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- Placeholder Charts -->
+    <div class="chart-placeholder">
+      📊 Confusion Matrix Placeholder
+    </div>
+    <div class="chart-placeholder">
+      📈 ROC Curve Placeholder
+    </div>
+
+    <!-- Analyze Button -->
+    <button class="analyze-btn">Analyze Another Review</button>
+
+  </div>
+</div>
+
+<script>
+  // Example interactivity for the Analyze Button
+  document.querySelector('.analyze-btn').addEventListener('click', () => {
+    const userText = prompt("Enter review text for analysis:");
+    if(userText){
+      alert(`You entered: "${userText}"\n\nReplace this alert with your real analysis functionality.`);
+      // Here, you would send the text to your backend and update the widget dynamically
+    }
+  });
+
+  // Expandable section smooth behavior
+  document.querySelectorAll('details').forEach(detail => {
+    detail.addEventListener('toggle', () => {
+      if (detail.open) {
+        detail.scrollIntoView({behavior: "smooth", block: "nearest"});
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

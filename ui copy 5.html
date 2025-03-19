@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Comparative Analysis Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+      margin: 0; padding: 0;
+    }
+
+    .widget {
+      position: fixed; border-radius: 16px;
+      background: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      overflow: hidden; z-index: 999;
+    }
+
+    .header {
+      background: #4f46e5; color: #fff;
+      padding: 14px; cursor: grab; font-weight: 600;
+    }
+
+    .content { padding: 14px; }
+
+    .model {
+      background: #f9fafb; border-radius: 8px;
+      padding: 10px; margin-bottom: 10px;
+    }
+
+    .confidence-bar {
+      background: #e5e7eb; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px;
+    }
+
+    .confidence-fill { height: 100%; transition: width 0.4s ease; }
+
+    details {
+      margin-top: 10px; cursor: pointer; color: #6366f1;
+    }
+
+    button {
+      background: #6366f1; color: #fff; padding: 8px 14px;
+      border: none; border-radius: 6px; cursor: pointer; margin: 5px;
+    }
+
+    button:hover { background: #4f46e5; }
+
+    canvas { max-height: 150px; }
+
+    /* Scrollbar Styling */
+    .content::-webkit-scrollbar { width: 6px; }
+    .content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+    /* Positioning widgets */
+    #predictionWidget { bottom: 20px; right: 20px; width: 350px; }
+    #reviewCarousel { bottom: 20px; left: 20px; width: 650px; }
+  </style>
+</head>
+<body>
+
+<!-- Prediction Widget -->
+<div class="widget" id="predictionWidget">
+  <div class="header">Model Predictions 🤖</div>
+  <div class="content">
+    <div class="model">
+      <strong>Transformer (BERT)</strong>
+      <div>Prediction: Positive 😊</div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width:88%; background:#10b981;"></div>
+      </div>
+      <details><summary>View Explanation</summary><p>Influential tokens listed here.</p></details>
+    </div>
+
+    <div class="model">
+      <strong>Logistic Regression</strong>
+      <div>Prediction: Negative 🙁</div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width:62%; background:#ef4444;"></div>
+      </div>
+      <details><summary>View Explanation</summary><p>Top features explained here.</p></details>
+    </div>
+  </div>
+</div>
+
+<!-- Review Carousel with Graph -->
+<div class="widget" id="reviewCarousel">
+  <div class="header">User Reviews & Confidence Trends 📈</div>
+  <div class="content">
+    <div id="reviewText">"This product exceeded my expectations! Highly recommended."</div>
+    <canvas id="confidenceGraph"></canvas>
+    <div style="text-align:center;">
+      <button onclick="prevReview()">← Prev</button>
+      <button onclick="nextReview()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const reviews = [
+  {text:"Exceeded my expectations!",bert:88,logistic:62},
+  {text:"Delivery was slow but quality good.",bert:75,logistic:55},
+  {text:"Disappointed; not as described.",bert:40,logistic:30},
+  {text:"Great value, will buy again.",bert:85,logistic:80},
+  {text:"Average performance, expected better.",bert:50,logistic:45}
+];
+
+let currentReview = 0;
+
+const ctx = document.getElementById('confidenceGraph').getContext('2d');
+const graphData = {
+  labels: ['Review 1'],
+  datasets: [
+    { label: 'BERT', data: [reviews[0].bert], borderColor:'#10b981', tension:0.4 },
+    { label: 'Logistic Regression', data: [reviews[0].logistic], borderColor:'#ef4444', tension:0.4 }
+  ]
+};
+
+const confidenceChart = new Chart(ctx, { type: 'line', data: graphData, options: { scales: { y:{ min:0,max:100 } }}});
+
+function updateReview(index){
+  document.getElementById('reviewText').textContent=`"${reviews[index].text}"`;
+  const lbl=`Review ${index+1}`;
+  if(!graphData.labels.includes(lbl)){
+    graphData.labels.push(lbl);
+    graphData.datasets[0].data.push(reviews[index].bert);
+    graphData.datasets[1].data.push(reviews[index].logistic);
+  }
+  confidenceChart.update();
+}
+
+function nextReview(){
+  currentReview=(currentReview+1)%reviews.length;
+  updateReview(currentReview);
+}
+
+function prevReview(){
+  currentReview=(currentReview-1+reviews.length)%reviews.length;
+  updateReview(currentReview);
+}
+
+// Draggable Widgets
+document.querySelectorAll('.widget').forEach(w=>{
+  let isDragging=false,offsetX,offsetY;
+  const header=w.querySelector('.header');
+  header.onmousedown=e=>{
+    isDragging=true;
+    offsetX=e.clientX-w.offsetLeft;
+    offsetY=e.clientY-w.offsetTop;
+  };
+  document.onmousemove=e=>{
+    if(!isDragging)return;
+    w.style.top=`${e.clientY-offsetY}px`;
+    w.style.left=`${e.clientX-offsetX}px`;
+  };
+  document.onmouseup=()=>isDragging=false;
+});
+</script>
+
+</body>
+</html>

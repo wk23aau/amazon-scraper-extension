@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Comparative Analysis with Reviews & Graph</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f3f4f6;
+      margin: 0; padding: 0;
+    }
+
+    .widget-container, .carousel, .matrix-widget {
+      position: fixed;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .widget-container {
+      bottom: 20px; right: 20px; width: 350px;
+    }
+
+    .carousel {
+      bottom: 290px; left: 20px; width: 650px; height: 320px;
+      padding: 12px;
+    }
+
+    .matrix-widget {
+      bottom: 20px; left: 20px; width: 350px;
+    }
+
+    .header {
+      padding: 14px;
+      background: #4f46e5;
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .body {
+      padding: 14px;
+      overflow-y: auto;
+      max-height: 480px;
+    }
+
+    .model, .matrix-cell {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .confidence-fill { height: 100%; }
+
+    .carousel-content {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 8px 14px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #4338ca; }
+
+    canvas { max-height: 180px; }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .metric-title { font-size: 13px; color: #6b7280; }
+    .metric-value { font-size: 18px; font-weight: bold; color: #374151; }
+  </style>
+</head>
+<body>
+
+<!-- Prediction Widget -->
+<div class="widget-container">
+  <div class="header">
+    AI Comparative Analysis 🤖
+  </div>
+  <div class="body">
+    <div class="model">
+      <strong>Transformer (BERT)</strong>
+      <div>Prediction: Positive 😊 (88%)</div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width:88%;background:#10b981;"></div>
+      </div>
+    </div>
+    <div class="model">
+      <strong>Logistic Regression</strong>
+      <div>Prediction: Negative 🙁 (62%)</div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width:62%;background:#ef4444;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Carousel -->
+<div class="carousel">
+  <div class="carousel-content" id="reviewText">
+    "This product exceeded my expectations! Highly recommended."
+  </div>
+  <canvas id="comparisonChart"></canvas>
+  <div class="controls">
+    <button onclick="prevReview()">← Prev</button>
+    <button onclick="nextReview()">Next →</button>
+  </div>
+</div>
+
+<!-- Confusion Matrix Widget -->
+<div class="matrix-widget">
+  <div class="header">Confusion Matrix 🔢</div>
+  <div class="body">
+    <div class="matrix-grid">
+      <div class="matrix-cell">
+        <div class="metric-title">True Positive</div>
+        <div class="metric-value">9998</div>
+      </div>
+      <div class="matrix-cell">
+        <div class="metric-title">False Positive</div>
+        <div class="metric-value">2</div>
+      </div>
+      <div class="matrix-cell">
+        <div class="metric-title">False Negative</div>
+        <div class="metric-value">1</div>
+      </div>
+      <div class="matrix-cell">
+        <div class="metric-title">True Negative</div>
+        <div class="metric-value">9999</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const reviews = [
+  {text:"This product exceeded my expectations! Highly recommended.",bert:88,logistic:62},
+  {text:"The delivery was slow, but I'm happy with the quality.",bert:75,logistic:55},
+  {text:"Disappointed with the product, not as described.",bert:40,logistic:30},
+  {text:"Great value for money, will buy again.",bert:85,logistic:80},
+  {text:"Average performance, expected better.",bert:50,logistic:45}
+];
+
+let current = 0;
+
+const ctx = document.getElementById('comparisonChart').getContext('2d');
+const data = {
+  labels: ['Review 1'],
+  datasets: [
+    {
+      label: 'BERT Confidence',
+      data: [reviews[0].bert],
+      borderColor: '#10b981',
+      backgroundColor: 'rgba(16,185,129,0.2)',
+      tension: 0.4
+    },
+    {
+      label: 'Logistic Regression Confidence',
+      data: [reviews[0].logistic],
+      borderColor: '#ef4444',
+      backgroundColor: 'rgba(239,68,68,0.2)',
+      tension: 0.4
+    }
+  ]
+};
+
+const chart = new Chart(ctx, {
+  type: 'line',
+  data: data,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {y: {suggestedMin: 0, suggestedMax: 100}}
+  }
+});
+
+function updateContent(index) {
+  document.getElementById('reviewText').textContent = `"${reviews[index].text}"`;
+  const reviewLabel = `Review ${index + 1}`;
+  if (!data.labels.includes(reviewLabel)) {
+    data.labels.push(reviewLabel);
+    data.datasets[0].data.push(reviews[index].bert);
+    data.datasets[1].data.push(reviews[index].logistic);
+  }
+  chart.update();
+}
+
+function nextReview() {
+  current = (current + 1) % reviews.length;
+  updateContent(current);
+}
+
+function prevReview() {
+  current = (current - 1 + reviews.length) % reviews.length;
+  updateContent(current);
+}
+</script>
+
+</body>
+</html>
