@@ -1,4 +1,5 @@
 (function() {
+    "use strict";
     console.log("Amazon Scraper content script loaded.");
 
     /********************************************************************
@@ -6,21 +7,40 @@
      ********************************************************************/
     let scraperState = "idle";
     let asinQueue = [];
-    let progressData = {}; // Progress tracked per ASIN
-    let scrapedReviewData = {}; // Store scraped reviews for analysis
+    let progressData = {};
+    let scrapedReviewData = {}; // { asin: { allReviews: [ {body, ...}, ... ] } }
 
-    // For analysis carousel (sample reviews for demonstration)
+    // Carousel state: current ASIN index and current review index within that ASIN
+    let currentAsinIndex = 0;
     let currentReviewIndex = 0;
-    const sampleReviews = [
-        "This product exceeded my expectations! Highly recommended.",
-        "The delivery was slow, but I'm happy with the quality.",
-        "Disappointed with the product, not as described.",
-        "Great value for money, will buy again.",
-        "Average performance, expected better."
-    ];
+
+    // We'll no longer use a fixed sampleReviews array—instead, use reviews collected for each ASIN.
+    // For fallback during development, you can uncomment the line below:
+    // const sampleReviews = [ "Review 1", "Review 2", "Review 3", "Review 4", "Review 5" ];
+
+    // Chart data (for the carousel comparison chart)
+    const chartData = {
+        labels: [], // e.g., ["Review 1", "Review 2", ...]
+        datasets: [
+            {
+                label: 'BERT Confidence',
+                data: [],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16,185,129,0.2)',
+                tension: 0.4
+            },
+            {
+                label: 'Logistic Regression Confidence',
+                data: [],
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239,68,68,0.2)',
+                tension: 0.4
+            }
+        ]
+    };
 
     /********************************************************************
-     * 2. STYLES - Reusable styles for UI elements
+     * 2. STYLES & UTILS
      ********************************************************************/
     const floatingContainerStyles = {
         position: "fixed",
@@ -31,10 +51,9 @@
         border: "1px solid #e5e7eb",
         padding: "18px",
         borderRadius: "12px",
-        fontFamily: "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        fontFamily: "'Inter', sans-serif",
         boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
-        width: "280px",
-        transition: "box-shadow 0.3s ease-in-out"
+        width: "280px"
     };
 
     const titleStyles = {
@@ -49,7 +68,7 @@
     const statusStyles = {
         marginBottom: "10px",
         fontSize: "0.95rem",
-        color: "#374151",
+        color: "#374151"
     };
 
     const progressStyles = {
@@ -57,12 +76,9 @@
         fontSize: "0.9rem",
         color: "#4b5563",
         maxHeight: "200px",
-        overflowY: "auto",
-        scrollbarWidth: "thin",
-        scrollbarColor: "#d1d5db #f9fafb"
+        overflowY: "auto"
     };
 
-    // Buttons Base
     const buttonBaseStyle = {
         padding: "8px 14px",
         border: "none",
@@ -70,24 +86,15 @@
         cursor: "pointer",
         fontSize: "0.9rem",
         fontWeight: "500",
-        transition: "transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease",
         marginRight: "6px",
         marginBottom: "6px"
     };
 
-    // Button Styles
     const startButtonStyle = { backgroundColor: "#10b981", color: "#fff" };
-    const startButtonHoverStyle = { backgroundColor: "#059669", transform: "translateY(-2px)", boxShadow: "0 4px 12px rgba(5,150,105,0.3)" };
     const pauseButtonStyle = { backgroundColor: "#f59e0b", color: "#fff" };
-    const pauseButtonHoverStyle = { backgroundColor: "#d97706", transform: "translateY(-2px)", boxShadow: "0 4px 12px rgba(217,119,6,0.3)" };
-    const stopButtonStyle = { backgroundColor: "#ef4444", color: "#fff" };
-    const stopButtonHoverStyle = { backgroundColor: "#dc2626", transform: "translateY(-2px)", boxShadow: "0 4px 12px rgba(220,38,38,0.3)" };
+    const stopButtonStyle  = { backgroundColor: "#ef4444", color: "#fff" };
     const analyzeButtonStyle = { backgroundColor: "#6366f1", color: "#fff" };
-    const analyzeButtonHoverStyle = { backgroundColor: "#4f46e5", transform: "translateY(-2px)", boxShadow: "0 4px 12px rgba(79,70,229,0.3)" };
 
-    /********************************************************************
-     * 3. DRAGGABLE FUNCTION - Make any element draggable
-     ********************************************************************/
     function makeDraggable(element) {
         let isDragging = false, offsetX = 0, offsetY = 0;
         element.style.cursor = "grab";
@@ -114,82 +121,125 @@
     }
 
     /********************************************************************
-     * 4. OVERLAY / FLOATING UI - SCRAPER CONTROLS
+     * 3. SERVER COMMUNICATION FUNCTIONS
      ********************************************************************/
-    const floatingContainer = document.createElement("div");
-    const scrollbarStyles = `
-        #amazonScraperFloatingUI::-webkit-scrollbar { width: 6px; }
-        #amazonScraperFloatingUI::-webkit-scrollbar-track { background: #f9fafb; border-radius: 6px; }
-        #amazonScraperFloatingUI::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 6px; }
-    `;
-    const styleEl = document.createElement('style');
-    styleEl.textContent = scrollbarStyles;
-    document.head.appendChild(styleEl);
-    Object.assign(floatingContainer.style, floatingContainerStyles);
-    floatingContainer.id = "amazonScraperFloatingUI";
+    async function sendReviewsToServer(asin, allReviews, criticalReviews, productDetailsHtml, reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml) {
+        const url = "http://localhost:3000/save-reviews";
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                asin, allReviews, criticalReviews,
+                productDetailsHtml, reviewHtml,
+                aodMainProductDetailsHtml, aodSellerInfoHtml
+            })
+        });
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        console.log(`Server response for ASIN ${asin}:`, data);
+    }
 
-    // Title for Scraper Control
-    const titleEl = document.createElement("div");
-    titleEl.textContent = "Amazon Scraper Control";
-    Object.assign(titleEl.style, titleStyles);
-    floatingContainer.appendChild(titleEl);
+    async function analyzeSingleReview(text) {
+        const url = "http://localhost:3000/analyze-review";
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+        if (!res.ok) throw new Error(`Analyze error: ${res.status}`);
+        const analysis = await res.json();
+        updateAnalysisUI(analysis);
+        return analysis;
+    }
 
-    // Status display
-    const statusEl = document.createElement("div");
-    statusEl.textContent = "Status: idle";
-    Object.assign(statusEl.style, statusStyles);
-    floatingContainer.appendChild(statusEl);
+    async function analyzeSentiment(reviewsTextArray) {
+        const url = "http://localhost:3000/batch-evaluate";
+        const samples = reviewsTextArray.map(text => ({ text, label: 1 }));
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ samples })
+        });
+        if (!res.ok) throw new Error(`Batch evaluation error: ${res.status}`);
+        const result = await res.json();
+        return result;
+    }
 
-    // Progress display
-    const progressEl = document.createElement("div");
-    Object.assign(progressEl.style, progressStyles);
-    progressEl.innerHTML = "Progress: N/A";
-    floatingContainer.appendChild(progressEl);
+    function updateAnalysisUI(analysis) {
+        const bertLabelEl = document.getElementById("bertLabel");
+        const bertConfidenceEl = document.getElementById("bertConfidence");
+        const lrLabelEl = document.getElementById("lrLabel");
+        const lrConfidenceEl = document.getElementById("lrConfidence");
+        if (analysis && analysis.bert && analysis.lr) {
+            bertLabelEl.textContent = `Prediction: ${analysis.bert.label} (${analysis.bert.confidence.toFixed(1)}%)`;
+            bertConfidenceEl.style.width = analysis.bert.confidence + "%";
+            lrLabelEl.textContent = `Prediction: ${analysis.lr.label} (${analysis.lr.confidence.toFixed(1)}%)`;
+            lrConfidenceEl.style.width = analysis.lr.confidence + "%";
+        } else {
+            bertLabelEl.textContent = "Prediction: N/A";
+            lrLabelEl.textContent = "Prediction: N/A";
+        }
+    }
 
-    // Control Buttons
+    /********************************************************************
+     * 4. UI CREATION
+     ********************************************************************/
+    // --- Scraper Control UI ---
+    const controlContainer = document.createElement("div");
+    Object.assign(controlContainer.style, floatingContainerStyles);
+    controlContainer.id = "amazonScraperFloatingUI";
+
+    const controlTitle = document.createElement("div");
+    controlTitle.textContent = "Amazon Scraper Control";
+    Object.assign(controlTitle.style, titleStyles);
+    controlContainer.appendChild(controlTitle);
+
+    const statusDisplay = document.createElement("div");
+    statusDisplay.textContent = "Status: idle";
+    Object.assign(statusDisplay.style, statusStyles);
+    controlContainer.appendChild(statusDisplay);
+
+    const progressDisplay = document.createElement("div");
+    Object.assign(progressDisplay.style, progressStyles);
+    progressDisplay.innerHTML = "Progress: N/A";
+    controlContainer.appendChild(progressDisplay);
+
     const startBtn = document.createElement("button");
     startBtn.innerText = "Start Scraping";
     Object.assign(startBtn.style, buttonBaseStyle, startButtonStyle);
-    startBtn.addEventListener("mouseover", () => Object.assign(startBtn.style, startButtonHoverStyle));
-    startBtn.addEventListener("mouseout", () => Object.assign(startBtn.style, startButtonStyle));
 
     const pauseBtn = document.createElement("button");
     pauseBtn.innerText = "Pause Scraping";
     Object.assign(pauseBtn.style, buttonBaseStyle, pauseButtonStyle);
-    pauseBtn.addEventListener("mouseover", () => Object.assign(pauseBtn.style, pauseButtonHoverStyle));
-    pauseBtn.addEventListener("mouseout", () => Object.assign(pauseBtn.style, pauseButtonStyle));
 
     const stopBtn = document.createElement("button");
     stopBtn.innerText = "Stop Scraping";
     Object.assign(stopBtn.style, buttonBaseStyle, stopButtonStyle);
-    stopBtn.addEventListener("mouseover", () => Object.assign(stopBtn.style, stopButtonHoverStyle));
-    stopBtn.addEventListener("mouseout", () => Object.assign(stopBtn.style, stopButtonStyle));
 
     const analyzeReviewsBtn = document.createElement("button");
-    analyzeReviewsBtn.innerText = "Analyze Reviews";
+    analyzeReviewsBtn.innerText = "Analyze Reviews (Current ASIN)";
     Object.assign(analyzeReviewsBtn.style, buttonBaseStyle, analyzeButtonStyle);
-    analyzeReviewsBtn.addEventListener("mouseover", () => Object.assign(analyzeReviewsBtn.style, analyzeButtonHoverStyle));
-    analyzeReviewsBtn.addEventListener("mouseout", () => Object.assign(analyzeReviewsBtn.style, analyzeButtonStyle));
     analyzeReviewsBtn.disabled = true;
+
+    const analyzeAllBtn = document.createElement("button");
+    analyzeAllBtn.innerText = "Analyze All Reviews";
+    Object.assign(analyzeAllBtn.style, buttonBaseStyle, analyzeButtonStyle);
 
     const analyzeCriticalBtn = document.createElement("button");
     analyzeCriticalBtn.innerText = "Analyze Critical";
     Object.assign(analyzeCriticalBtn.style, buttonBaseStyle, analyzeButtonStyle);
-    analyzeCriticalBtn.addEventListener("mouseover", () => Object.assign(analyzeCriticalBtn.style, analyzeButtonHoverStyle));
-    analyzeCriticalBtn.addEventListener("mouseout", () => Object.assign(analyzeCriticalBtn.style, analyzeButtonStyle));
     analyzeCriticalBtn.disabled = true;
 
-    floatingContainer.appendChild(startBtn);
-    floatingContainer.appendChild(pauseBtn);
-    floatingContainer.appendChild(stopBtn);
-    floatingContainer.appendChild(analyzeReviewsBtn);
-    floatingContainer.appendChild(analyzeCriticalBtn);
-    document.body.appendChild(floatingContainer);
-    makeDraggable(floatingContainer);
+    controlContainer.appendChild(startBtn);
+    controlContainer.appendChild(pauseBtn);
+    controlContainer.appendChild(stopBtn);
+    controlContainer.appendChild(analyzeReviewsBtn);
+    controlContainer.appendChild(analyzeCriticalBtn);
+    controlContainer.appendChild(analyzeAllBtn);
+    document.body.appendChild(controlContainer);
+    makeDraggable(controlContainer);
 
-    /********************************************************************
-     * 4A. ANALYSIS UI - Floating Container for AI Comparative Analysis
-     ********************************************************************/
+    // --- Analysis UI (Single Review) ---
     const analysisContainer = document.createElement("div");
     analysisContainer.id = "analysisContainer";
     Object.assign(analysisContainer.style, {
@@ -205,229 +255,164 @@
         fontFamily: "'Inter', sans-serif"
     });
     analysisContainer.innerHTML = `
-      <div class="header" style="padding:14px; background:#4f46e5; color:#fff; font-weight:600; font-size:16px; display:flex; justify-content:space-between; align-items:center; cursor:move;">
-          AI Comparative Analysis 🤖
+      <div style="padding:14px; background:#4f46e5; color:#fff; font-weight:600; font-size:16px; cursor:move;">
+        AI Comparative Analysis 🤖
       </div>
-      <div class="body" style="padding:14px; overflow-y:auto; max-height:480px;">
-          <div class="model" style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
-              <div><strong>Transformer (BERT)</strong></div>
-              <div id="bertLabel">Prediction: N/A</div>
-              <div class="confidence-bar" style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; overflow:hidden; margin-top:4px;">
-                  <div id="bertConfidence" class="confidence-fill" style="height:100%; width:0%; background:#10b981;"></div>
-              </div>
+      <div style="padding:14px; overflow-y:auto; max-height:480px;">
+        <div style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
+          <div><strong>Transformer (BERT)</strong></div>
+          <div id="bertLabel">Prediction: N/A</div>
+          <div style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; margin-top:4px; overflow:hidden;">
+            <div id="bertConfidence" style="height:100%; width:0%; background:#10b981;"></div>
           </div>
-          <div class="model" style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
-              <div><strong>Logistic Regression</strong></div>
-              <div id="lrLabel">Prediction: N/A</div>
-              <div class="confidence-bar" style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; overflow:hidden; margin-top:4px;">
-                  <div id="lrConfidence" class="confidence-fill" style="height:100%; width:0%; background:#ef4444;"></div>
-              </div>
+        </div>
+        <div style="background:#f9fafb; border-radius:8px; padding:10px; margin-bottom:10px;">
+          <div><strong>Logistic Regression</strong></div>
+          <div id="lrLabel">Prediction: N/A</div>
+          <div style="width:100%; height:6px; background:#e5e7eb; border-radius:3px; margin-top:4px; overflow:hidden;">
+            <div id="lrConfidence" style="height:100%; width:0%; background:#ef4444;"></div>
           </div>
-          <div style="margin-top:10px;">
-              <input id="analysisInput" type="text" placeholder="Enter review text" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ccc; border-radius:4px;">
-              <button id="analyzeBtn" style="width:100%; padding:8px; background:#6366f1; color:#fff; border:none; border-radius:6px; cursor:pointer;">Analyze Review</button>
-          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <input id="analysisInput" type="text" placeholder="Enter review text" style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ccc; border-radius:4px;">
+          <button id="analyzeBtn" style="width:100%; padding:8px; background:#6366f1; color:#fff; border:none; border-radius:6px; cursor:pointer;">Analyze Review</button>
+        </div>
       </div>
     `;
     document.body.appendChild(analysisContainer);
     makeDraggable(analysisContainer);
 
-    /********************************************************************
-     * 4B. CONFUSION MATRIX WIDGET (Draggable)
-     ********************************************************************/
-    const confusionMatrixContainer = document.createElement("div");
-    confusionMatrixContainer.id = "dragMatrix";
-    Object.assign(confusionMatrixContainer.style, {
+    // --- Confusion Matrix Widget ---
+    const matrixContainer = document.createElement("div");
+    matrixContainer.id = "matrixContainer";
+    Object.assign(matrixContainer.style, {
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        width: "400px",
         background: "#ffffff",
         borderRadius: "16px",
         boxShadow: "0 12px 24px rgba(0,0,0,0.15)",
         padding: "20px",
-        width: "400px",
-        position: "fixed",
-        top: "20px",
-        right: "20px",
         cursor: "move",
         zIndex: "1000",
         fontFamily: "'Inter', sans-serif"
     });
-    confusionMatrixContainer.innerHTML = `
-      <div class="matrix-header" style="background:#6366f1; color:#fff; padding:12px; border-radius:8px; font-weight:600; text-align:center; margin-bottom:16px;">
-         Confusion Matrix 🔢
+    matrixContainer.innerHTML = `
+      <div style="background:#6366f1; color:#fff; padding:12px; border-radius:8px; font-weight:600; text-align:center; margin-bottom:16px;">
+        Confusion Matrix 🔢
       </div>
-      <div class="matrix-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
-         <div class="matrix-cell" style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-             <div class="cell-title" style="color:#6b7280; font-size:13px;">True Positive</div>
-             <div class="cell-value" id="tp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-         </div>
-         <div class="matrix-cell" style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-             <div class="cell-title" style="color:#6b7280; font-size:13px;">False Positive</div>
-             <div class="cell-value" id="fp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-         </div>
-         <div class="matrix-cell" style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-             <div class="cell-title" style="color:#6b7280; font-size:13px;">False Negative</div>
-             <div class="cell-value" id="fn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-         </div>
-         <div class="matrix-cell" style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
-             <div class="cell-title" style="color:#6b7280; font-size:13px;">True Negative</div>
-             <div class="cell-value" id="tn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
-         </div>
+      <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px;">
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
+          <div style="color:#6b7280; font-size:13px;">True Positive</div>
+          <div id="tp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
+        </div>
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
+          <div style="color:#6b7280; font-size:13px;">False Positive</div>
+          <div id="fp" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
+        </div>
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
+          <div style="color:#6b7280; font-size:13px;">False Negative</div>
+          <div id="fn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
+        </div>
+        <div style="background:#f9fafb; border-radius:8px; padding:12px; text-align:center;">
+          <div style="color:#6b7280; font-size:13px;">True Negative</div>
+          <div id="tn" style="color:#374151; font-size:20px; font-weight:bold;">-</div>
+        </div>
       </div>
     `;
-    document.body.appendChild(confusionMatrixContainer);
-    makeDraggable(confusionMatrixContainer);
+    document.body.appendChild(matrixContainer);
+    makeDraggable(matrixContainer);
 
-    // Function to update confusion matrix values
-    function updateConfusionMatrix(tp, fp, fn, tn) {
-        document.getElementById("tp").textContent = tp;
-        document.getElementById("fp").textContent = fp;
-        document.getElementById("fn").textContent = fn;
-        document.getElementById("tn").textContent = tn;
-    }
+    // --- Carousel / Comparison Chart UI ---
+    const carouselContainer = document.createElement("div");
+    carouselContainer.id = "carouselContainer";
+    Object.assign(carouselContainer.style, {
+        position: "fixed",
+        bottom: "290px",
+        left: "20px",
+        width: "650px",
+        height: "320px",
+        background: "#ffffff",
+        borderRadius: "14px",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+        overflow: "hidden",
+        zIndex: "999"
+    });
+    carouselContainer.innerHTML = `
+      <div id="reviewText" style="height:70px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#374151; margin-bottom:10px; cursor:move;">
+        <!-- Placeholder; will be updated with collected reviews -->
+      </div>
+      <canvas id="comparisonChart" style="max-height:180px;"></canvas>
+      <div style="display:flex; justify-content:space-between; padding:0 12px 12px;">
+        <button id="prevReviewBtn">← Prev</button>
+        <button id="nextReviewBtn">Next →</button>
+      </div>
+    `;
+    document.body.appendChild(carouselContainer);
+    makeDraggable(carouselContainer);
+
+    // Initialize Chart.js chart
+    const ctx = document.getElementById("comparisonChart").getContext("2d");
+    const comparisonChart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { suggestedMin: 0, suggestedMax: 100 } }
+        }
+    });
 
     /********************************************************************
-     * 5. EVENT LISTENERS FOR SCRAPER BUTTONS & ANALYSIS
+     * 5. EVENT LISTENER ATTACHMENTS
      ********************************************************************/
     startBtn.addEventListener("click", handleStartButtonClick);
     pauseBtn.addEventListener("click", handlePauseButtonClick);
     stopBtn.addEventListener("click", handleStopButtonClick);
-    analyzeReviewsBtn.addEventListener("click", () => handleAnalyzeButtonClick("all"));
+    analyzeReviewsBtn.addEventListener("click", handleBatchAnalyze); // Batch for current ASIN
     analyzeCriticalBtn.addEventListener("click", () => handleAnalyzeButtonClick("critical"));
+    analyzeAllBtn.addEventListener("click", handleAnalyzeAll);
     document.getElementById("analyzeBtn").addEventListener("click", () => {
-        const text = document.getElementById("analysisInput").value;
-        if (text.trim() === "") {
+        const text = document.getElementById("analysisInput").value.trim();
+        if (!text) {
             alert("Please enter a review text to analyze.");
             return;
         }
-        analyzeSingleReview(text);
+        analyzeSingleReview(text)
+            .then(analysis => updateAnalysisUI(analysis))
+            .catch(err => console.error(err));
     });
-    // Ensure carousel control elements exist in your page; if not, create them.
-    // For demonstration, assume carousel HTML is added externally.
+    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
+    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
 
     /********************************************************************
-     * 6. SCRAPER CONTROL LOOP & ANALYSIS FUNCTIONS
+     * 6. SINGLE & BATCH ANALYSIS FUNCTIONS
      ********************************************************************/
-    async function handleStartButtonClick() {
-        if (scraperState === "running") {
-            console.log("Already running.");
-            return;
-        }
-        if (scraperState === "paused") {
-            scraperState = "running";
-            statusEl.textContent = `Status: running (resumed)`;
-            runScraperLoop();
-        } else {
-            scraperState = "running";
-            statusEl.textContent = `Status: running`;
-            asinQueue = [];
-            currentReviewIndex = 0;
-            scrapedReviewData = {};
-            const extractedAsins = extractAsins();
-            if (extractedAsins.length === 0) {
-                scraperState = "idle";
-                statusEl.textContent = `Status: idle (no ASINs found)`;
-                progressEl.innerHTML = "No ASINs found on this page.";
-                return;
-            }
-            asinQueue = extractedAsins;
-            console.log("Extracted ASINs:", asinQueue);
-            progressData = asinQueue.reduce((acc, asin) => { acc[asin] = { step: "pending" }; return acc; }, {});
-            updateOverallProgressUI();
-            analyzeReviewsBtn.disabled = true;
-            analyzeCriticalBtn.disabled = true;
-            try {
-                const response = await fetch("http://localhost:3000/start-scrape", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ asins: asinQueue })
-                });
-                if (!response.ok) {
-                    const message = `Failed to start scrape. Status: ${response.status}`;
-                    statusEl.textContent = `Status: Error - ${message}`;
-                    scraperState = "idle";
-                    throw new Error(message);
-                }
-                const data = await response.json();
-                console.log("Scrape started:", data);
-                statusEl.textContent = `Status: running (started)`;
-                runScraperLoop();
-            } catch (error) {
-                console.error("Error starting scrape:", error);
-                statusEl.textContent = `Status: Error - ${error.message}`;
-                scraperState = "idle";
-            }
-        }
-    }
-
-    function handlePauseButtonClick() {
-        if (scraperState === "running") {
-            scraperState = "paused";
-            statusEl.textContent = `Status: paused`;
-            console.log("Paused scraping.");
-        }
-    }
-
-    function handleStopButtonClick() {
-        scraperState = "stopped";
-        statusEl.textContent = `Status: stopped`;
-        console.log("Stopped scraping.");
-        analyzeReviewsBtn.disabled = false;
-        analyzeCriticalBtn.disabled = false;
-    }
-
-    async function handleAnalyzeButtonClick(reviewType) {
-        if (scraperState !== "idle" && scraperState !== "stopped") {
-            alert("Please stop scraping before analyzing.");
-            return;
-        }
-        if (Object.keys(scrapedReviewData).length === 0) {
-            alert("No reviews scraped yet.");
-            return;
-        }
-        statusEl.textContent = `Status: Analyzing ${reviewType} reviews...`;
-        progressEl.innerHTML = "Analyzing reviews, please wait...";
-        analyzeReviewsBtn.disabled = true;
-        analyzeCriticalBtn.disabled = true;
-        for (const asin of asinQueue) {
-            if (scrapedReviewData[asin] && scrapedReviewData[asin][`${reviewType}Reviews`]) {
-                const reviewsForAnalysis = scrapedReviewData[asin][`${reviewType}Reviews`].map(r => r.body).filter(body => body);
-                if (reviewsForAnalysis.length > 0) {
-                    updateProgressForAsin(asin, `analyzing-${reviewType}-reviews`);
-                    try {
-                        const analysisResults = await analyzeSentiment(reviewsForAnalysis);
-                        progressData[asin][`${reviewType}Analysis`] = analysisResults;
-                        updateProgressForAsin(asin, `analysis-${reviewType}-done`, analysisResults);
-                    } catch (error) {
-                        console.error(`Error analyzing ${reviewType} for ASIN ${asin}:`, error);
-                        updateProgressForAsin(asin, `analysis-${reviewType}-error`, error.message);
-                    }
-                } else {
-                    updateProgressForAsin(asin, `analysis-${reviewType}-no-reviews`);
-                }
-            } else {
-                updateProgressForAsin(asin, `analysis-${reviewType}-no-data`);
-            }
-        }
-        statusEl.textContent = `Status: Analysis complete`;
-        analyzeReviewsBtn.disabled = false;
-        analyzeCriticalBtn.disabled = false;
-        updateOverallProgressUI();
-    }
-
-    // New: Single review analysis via /analyze-review endpoint
     async function analyzeSingleReview(text) {
-        try {
-            const response = await fetch("http://localhost:3000/analyze-review", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
-            });
-            if (!response.ok) throw new Error(`Error: ${response.status}`);
-            const analysis = await response.json();
-            updateAnalysisUI(analysis);
-        } catch (error) {
-            console.error("Error analyzing review:", error);
-            alert("Failed to analyze review text.");
-        }
+        const url = "http://localhost:3000/analyze-review";
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text })
+        });
+        if (!res.ok) throw new Error(`Analyze error: ${res.status}`);
+        const analysis = await res.json();
+        updateAnalysisUI(analysis);
+        return analysis;
+    }
+
+    async function analyzeSentiment(reviewsTextArray) {
+        const url = "http://localhost:3000/batch-evaluate";
+        const samples = reviewsTextArray.map(text => ({ text, label: 1 }));
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ samples })
+        });
+        if (!res.ok) throw new Error(`Batch evaluation error: ${res.status}`);
+        const result = await res.json();
+        return result;
     }
 
     function updateAnalysisUI(analysis) {
@@ -437,53 +422,184 @@
         const lrConfidenceEl = document.getElementById("lrConfidence");
         if (analysis && analysis.bert && analysis.lr) {
             bertLabelEl.textContent = `Prediction: ${analysis.bert.label} (${analysis.bert.confidence.toFixed(1)}%)`;
-            bertConfidenceEl.style.width = `${analysis.bert.confidence}%`;
+            bertConfidenceEl.style.width = analysis.bert.confidence + "%";
             lrLabelEl.textContent = `Prediction: ${analysis.lr.label} (${analysis.lr.confidence.toFixed(1)}%)`;
-            lrConfidenceEl.style.width = `${analysis.lr.confidence}%`;
+            lrConfidenceEl.style.width = analysis.lr.confidence + "%";
         } else {
             bertLabelEl.textContent = "Prediction: N/A";
             lrLabelEl.textContent = "Prediction: N/A";
         }
     }
 
-    // Carousel functions for sample reviews
-    function updateCarousel() {
-        const reviewTextEl = document.getElementById("reviewText");
-        reviewTextEl.textContent = `"${sampleReviews[currentReviewIndex]}"`;
-        analyzeSingleReview(sampleReviews[currentReviewIndex]);
+    async function handleBatchAnalyze() {
+        // Batch analyze reviews for the current ASIN
+        if (asinQueue.length === 0) {
+            alert("No ASINs available.");
+            return;
+        }
+        const currentAsin = asinQueue[currentAsinIndex];
+        const asinData = scrapedReviewData[currentAsin];
+        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
+            alert("No reviews available for the current ASIN.");
+            return;
+        }
+        const reviewsArray = asinData.allReviews.map(r => r.body).filter(Boolean);
+        try {
+            const result = await analyzeSentiment(reviewsArray);
+            console.log("Batch evaluation result:", result);
+            if (result.metrics_bert && result.metrics_bert.confusion_matrix) {
+                const cm = result.metrics_bert.confusion_matrix;
+                updateConfusionMatrix(cm[1][1], cm[0][1], cm[1][0], cm[0][0]);
+            }
+        } catch (error) {
+            console.error("Error during batch analysis:", error);
+            alert("Failed batch analysis.");
+        }
     }
-    function nextReview() {
-        currentReviewIndex = (currentReviewIndex + 1) % sampleReviews.length;
-        updateCarousel();
+
+    async function handleAnalyzeAll() {
+        // Batch analyze all reviews across all ASINs.
+        let allReviews = [];
+        Object.values(scrapedReviewData).forEach(obj => {
+            if (obj.allReviews && obj.allReviews.length > 0) {
+                allReviews = allReviews.concat(obj.allReviews.map(r => r.body).filter(Boolean));
+            }
+        });
+        if (allReviews.length === 0) {
+            alert("No reviews available for analysis.");
+            return;
+        }
+        try {
+            const result = await analyzeSentiment(allReviews);
+            console.log("Batch evaluation (all) result:", result);
+            if (result.metrics_bert && result.metrics_bert.confusion_matrix) {
+                const cm = result.metrics_bert.confusion_matrix;
+                updateConfusionMatrix(cm[1][1], cm[0][1], cm[1][0], cm[0][0]);
+            }
+        } catch (error) {
+            console.error("Error during analyze all:", error);
+            alert("Failed batch analysis for all reviews.");
+        }
     }
-    function prevReview() {
-        currentReviewIndex = (currentReviewIndex - 1 + sampleReviews.length) % sampleReviews.length;
-        updateCarousel();
+
+    function handleAnalyzeButtonClick(reviewType) {
+        alert(`Placeholder: analyzing ${reviewType} reviews...`);
     }
 
     /********************************************************************
-     * 7. SCRAPER CONTROL LOOP & UTILITY FUNCTIONS
+     * 16. CAROUSEL & CHART UPDATE FUNCTIONS
+     ********************************************************************/
+    // Update the carousel using reviews from scrapedReviewData for the current ASIN.
+    function updateCarouselForCurrentReview(analysis) {
+        const reviewTextEl = document.getElementById("reviewText");
+        const currentAsin = asinQueue[currentAsinIndex];
+        const asinData = scrapedReviewData[currentAsin];
+        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
+            reviewTextEl.textContent = "No reviews for current ASIN.";
+            return;
+        }
+        const review = asinData.allReviews[currentReviewIndex];
+        reviewTextEl.textContent = review ? `"${review.body}"` : "No review text available.";
+
+        const reviewLabel = `Review ${currentReviewIndex + 1}`;
+        if (currentReviewIndex === chartData.labels.length) {
+            chartData.labels.push(reviewLabel);
+            chartData.datasets[0].data.push(analysis.bert.confidence);
+            chartData.datasets[1].data.push(analysis.lr.confidence);
+        } else {
+            chartData.labels[currentReviewIndex] = reviewLabel;
+            chartData.datasets[0].data[currentReviewIndex] = analysis.bert.confidence;
+            chartData.datasets[1].data[currentReviewIndex] = analysis.lr.confidence;
+            while (chartData.labels.length > currentReviewIndex + 1) {
+                chartData.labels.pop();
+                chartData.datasets[0].data.pop();
+                chartData.datasets[1].data.pop();
+            }
+        }
+        comparisonChart.update();
+    }
+
+    async function nextReview() {
+        if (asinQueue.length === 0) return;
+        const currentAsin = asinQueue[currentAsinIndex];
+        const asinData = scrapedReviewData[currentAsin];
+        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
+            alert("No reviews for current ASIN.");
+            return;
+        }
+        if (currentReviewIndex < asinData.allReviews.length - 1) {
+            currentReviewIndex++;
+        } else {
+            if (currentAsinIndex < asinQueue.length - 1) {
+                currentAsinIndex++;
+                currentReviewIndex = 0;
+            } else {
+                alert("No more reviews available.");
+                return;
+            }
+        }
+        try {
+            const analysis = await analyzeSingleReview(asinData.allReviews[currentReviewIndex].body);
+            updateCarouselForCurrentReview(analysis);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function prevReview() {
+        if (asinQueue.length === 0) return;
+        const currentAsin = asinQueue[currentAsinIndex];
+        const asinData = scrapedReviewData[currentAsin];
+        if (!asinData || !asinData.allReviews || asinData.allReviews.length === 0) {
+            alert("No reviews for current ASIN.");
+            return;
+        }
+        if (currentReviewIndex > 0) {
+            currentReviewIndex--;
+        } else {
+            if (currentAsinIndex > 0) {
+                currentAsinIndex--;
+                const prevAsinData = scrapedReviewData[asinQueue[currentAsinIndex]];
+                currentReviewIndex = (prevAsinData && prevAsinData.allReviews && prevAsinData.allReviews.length > 0) ? prevAsinData.allReviews.length - 1 : 0;
+            } else {
+                alert("Already at the first review of the first ASIN.");
+                return;
+            }
+        }
+        try {
+            const analysis = await analyzeSingleReview(asinData.allReviews[currentReviewIndex].body);
+            updateCarouselForCurrentReview(analysis);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
+    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
+
+    /********************************************************************
+     * 17. SCRAPER LOOP & PROGRESS UPDATE
      ********************************************************************/
     async function runScraperLoop() {
         if (scraperState !== "running") {
             scraperState = "running";
-            statusEl.textContent = `Status: running`;
+            statusDisplay.textContent = "Status: running";
         }
-        const scrapePromises = asinQueue.map(asin => scrapeAsin(asin));
-        await Promise.all(scrapePromises);
+        const tasks = asinQueue.map(asin => scrapeAsin(asin));
+        await Promise.all(tasks);
         if (scraperState === "running") {
             scraperState = "idle";
-            statusEl.textContent = `Status: idle (queue processed)`;
-            progressEl.innerHTML = "All ASINs processed. Scraping complete.";
+            statusDisplay.textContent = "Status: idle (queue processed)";
+            progressDisplay.innerHTML = "All ASINs processed. Scraping complete.";
             analyzeReviewsBtn.disabled = false;
             analyzeCriticalBtn.disabled = false;
         }
     }
 
     async function scrapeAsin(asin) {
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "scraping-details");
-        let productDetailsHtml = null;
+        let productDetailsHtml;
         try {
             productDetailsHtml = await fetchProductDetailsPage(asin);
             updateProgressForAsin(asin, "detailsDone", true);
@@ -491,9 +607,9 @@
             updateProgressForAsin(asin, "detailsError", error.message);
             return;
         }
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "scraping-aod-main");
-        let aodMainProductDetailsHtml = null;
+        let aodMainProductDetailsHtml;
         try {
             aodMainProductDetailsHtml = await fetchAodMainProductDetailsPage(asin);
             updateProgressForAsin(asin, "aodMainDone", true);
@@ -501,9 +617,9 @@
             updateProgressForAsin(asin, "aodMainError", error.message);
             return;
         }
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "scraping-aod-sellers");
-        let aodSellerInfoHtml = null;
+        let aodSellerInfoHtml;
         try {
             aodSellerInfoHtml = await fetchAodSellerInfoPage(asin);
             updateProgressForAsin(asin, "aodSellerDone", true);
@@ -511,9 +627,9 @@
             updateProgressForAsin(asin, "aodSellerError", error.message);
             return;
         }
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "scraping-all-reviews");
-        let allReviewsData = null;
+        let allReviewsData;
         try {
             allReviewsData = await fetchReviewPage(asin, "all");
             updateProgressForAsin(asin, "allReviewsDone", true);
@@ -521,9 +637,9 @@
             updateProgressForAsin(asin, "allReviewsError", error.message);
             return;
         }
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "scraping-critical-reviews");
-        let criticalReviewsData = null;
+        let criticalReviewsData;
         try {
             criticalReviewsData = await fetchReviewPage(asin, "critical");
             updateProgressForAsin(asin, "criticalReviewsDone", true);
@@ -531,10 +647,18 @@
             updateProgressForAsin(asin, "criticalReviewsError", error.message);
             return;
         }
-        if (scraperState !== 'running') return;
+        if (scraperState !== "running") return;
         updateProgressForAsin(asin, "sending-to-server");
         try {
-            await sendReviewsToServer(asin, allReviewsData.accumulatedReviews, criticalReviewsData.accumulatedReviews, productDetailsHtml, allReviewsData.reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml);
+            await sendReviewsToServer(
+                asin,
+                allReviewsData.accumulatedReviews,
+                criticalReviewsData.accumulatedReviews,
+                productDetailsHtml,
+                allReviewsData.reviewHtml,
+                aodMainProductDetailsHtml,
+                aodSellerInfoHtml
+            );
             updateProgressForAsin(asin, "done", true);
             scrapedReviewData[asin] = {
                 allReviews: allReviewsData.accumulatedReviews,
@@ -549,29 +673,15 @@
         let completedCount = 0, errorCount = 0, analysisCount = 0;
         Object.keys(progressData).forEach(asin => {
             if (progressData[asin].done) completedCount++;
-            else if (progressData[asin].detailsError || progressData[asin].aodMainError || progressData[asin].aodSellerError || progressData[asin].allReviewsError || progressData[asin].criticalReviewsError || progressData[asin].serverError) errorCount++;
+            else if (progressData[asin].detailsError || progressData[asin].serverError) errorCount++;
             if (progressData[asin].analysisAllDone || progressData[asin].analysisCriticalDone) analysisCount++;
         });
-        progressEl.innerHTML = `
-            <p>Status: ${scraperState}</p>
-            <p>Scraped: ${completedCount} / ${asinQueue.length}</p>
-            <p>Analyzed: ${analysisCount} / ${asinQueue.length}</p>
-            <p>Scrape Errors: ${errorCount}</p>
-            ${asinQueue.map(asin => getAsinProgressHTML(asin)).join('')}
-        `;
-    }
-
-    function getAsinProgressHTML(asin) {
-        const p = progressData[asin];
-        let summaryStatus = p.done ? "✅ Done" : (p.serverError || p.criticalReviewsError || p.allReviewsError || p.aodSellerError || p.aodMainError || p.detailsError ? "❌ Error" : "🔍 Scraping...");
-        let statusColor = p.done ? "green" : (p.serverError ? "red" : "darkorange");
-        return `
-            <details style="margin-bottom:8px;border:1px solid #f3f4f6;background:#fafafa;padding:10px;border-radius:8px;">
-                <summary style="font-size: 0.95em; font-weight: bold; color: ${statusColor}; cursor: pointer; list-style: none;">
-                    ASIN: ${asin} - Status: ${summaryStatus} <span style="font-weight: normal; color: #777;">(Click to expand)</span>
-                </summary>
-            </details>
-        `;
+        progressDisplay.innerHTML = `
+        <p>Status: ${scraperState}</p>
+        <p>Scraped: ${completedCount} / ${asinQueue.length}</p>
+        <p>Analyzed: ${analysisCount} / ${asinQueue.length}</p>
+        <p>Errors: ${errorCount}</p>
+      `;
     }
 
     function updateProgressForAsin(asin, step, value = null) {
@@ -581,151 +691,281 @@
     }
 
     /********************************************************************
-     * 8. UTILITY FUNCTIONS & SERVER COMMUNICATION
+     * 18. EVENT LISTENER ATTACHMENTS
      ********************************************************************/
-    async function sendReviewsToServer(asin, allReviews, criticalReviews, productDetailsHtml, reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml) {
-        const serverUrl = "http://localhost:3000/save-reviews";
-        try {
-            const response = await fetch(serverUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ asin, allReviews, criticalReviews, productDetailsHtml, reviewHtml, aodMainProductDetailsHtml, aodSellerInfoHtml })
-            });
-            if (!response.ok) throw new Error(`Server error: ${response.status}`);
-            const responseData = await response.json();
-            console.log(`Server response for ASIN ${asin}:`, responseData);
-        } catch (error) {
-            console.error(`Error sending reviews for ASIN ${asin}:`, error);
-            throw error;
+    startBtn.addEventListener("click", handleStartButtonClick);
+    pauseBtn.addEventListener("click", handlePauseButtonClick);
+    stopBtn.addEventListener("click", handleStopButtonClick);
+    analyzeReviewsBtn.addEventListener("click", handleBatchAnalyze);
+    analyzeCriticalBtn.addEventListener("click", () => handleAnalyzeButtonClick("critical"));
+    analyzeAllBtn.addEventListener("click", handleAnalyzeAll);
+    document.getElementById("analyzeBtn").addEventListener("click", () => {
+        const text = document.getElementById("analysisInput").value.trim();
+        if (!text) {
+            alert("Please enter a review text to analyze.");
+            return;
         }
-    }
+        analyzeSingleReview(text)
+            .then(analysis => updateAnalysisUI(analysis))
+            .catch(err => console.error(err));
+    });
+    document.getElementById("prevReviewBtn").addEventListener("click", prevReview);
+    document.getElementById("nextReviewBtn").addEventListener("click", nextReview);
 
-    // Updated analyzeSentiment: now calls the Node endpoint /analyze-review for each review
-    async function analyzeSentiment(reviewsTextArray) {
-        const analysisServerUrl = "http://localhost:3000/analyze-review";
-        let allPredictions = [];
-        for (const text of reviewsTextArray) {
+    /********************************************************************
+     * 15. SCRAPER CONTROL HANDLERS
+     ********************************************************************/
+    async function handleStartButtonClick() {
+        if (scraperState === "running") return;
+        if (scraperState === "paused") {
+            scraperState = "running";
+            statusDisplay.textContent = "Status: running (resumed)";
+            runScraperLoop();
+        } else {
+            scraperState = "running";
+            statusDisplay.textContent = "Status: running";
+            asinQueue = [];
+            progressData = {};
+            scrapedReviewData = {};
+            const extractedAsins = extractAsins();
+            if (extractedAsins.length === 0) {
+                scraperState = "idle";
+                statusDisplay.textContent = "Status: idle (no ASINs found)";
+                progressDisplay.innerHTML = "No ASINs found on the page.";
+                return;
+            }
+            asinQueue = extractedAsins;
+            console.log("ASINs found:", asinQueue);
+            asinQueue.forEach(asin => { progressData[asin] = { step: "pending" }; });
+            updateOverallProgressUI();
+            analyzeReviewsBtn.disabled = true;
+            analyzeCriticalBtn.disabled = true;
             try {
-                const response = await fetch(analysisServerUrl, {
+                const resp = await fetch("http://localhost:3000/start-scrape", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text })
+                    body: JSON.stringify({ asins: asinQueue })
                 });
-                if (!response.ok) throw new Error(`Analysis server error: ${response.status}`);
-                const responseData = await response.json();
-                // Use BERT prediction from the response
-                allPredictions.push({
-                    text,
-                    prediction: responseData.bert.label,
-                    confidence: responseData.bert.confidence
-                });
+                if (!resp.ok) {
+                    const msg = `Failed to start. Status: ${resp.status}`;
+                    statusDisplay.textContent = `Status: Error - ${msg}`;
+                    scraperState = "idle";
+                    throw new Error(msg);
+                }
+                const data = await resp.json();
+                console.log("Scrape started:", data);
+                runScraperLoop();
             } catch (error) {
-                console.error("Error during sentiment analysis:", error);
-                throw error;
+                console.error("Error starting scrape:", error);
+                statusDisplay.textContent = `Status: Error - ${error.message}`;
+                scraperState = "idle";
             }
         }
-        return { predictions: allPredictions };
     }
 
-    function extractAsins() {
-        const asinElements = document.querySelectorAll('div[data-asin]');
-        const asins = [];
-        asinElements.forEach(el => { const asin = el.getAttribute('data-asin'); if (asin) asins.push(asin); });
-        return asins;
+    function handlePauseButtonClick() {
+        if (scraperState === "running") {
+            scraperState = "paused";
+            statusDisplay.textContent = "Status: paused";
+        }
+    }
+
+    function handleStopButtonClick() {
+        scraperState = "stopped";
+        statusDisplay.textContent = "Status: stopped";
+        analyzeReviewsBtn.disabled = false;
+        analyzeCriticalBtn.disabled = false;
+        console.log("Stopped scraping.");
+    }
+
+    /********************************************************************
+     * 9. UTILITY FUNCTIONS - Functional Logic
+     ********************************************************************/
+    // A simple wait function for “pausing” loops (not used in this version but kept for potential future use)
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     async function fetchProductDetailsPage(asin) {
-        const url = `https://www.amazon.com/dp/${asin}/`;
+        const productDetailsUrl = `https://www.amazon.com/dp/${asin}/`;
+        console.log(`[DEBUG] Fetching product details page: ${productDetailsUrl}`);
+
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            return await response.text();
+            const response = await fetch(productDetailsUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${productDetailsUrl}`);
+            }
+            const productDetailsHtml = await response.text();
+            return productDetailsHtml;
         } catch (error) {
-            console.error(`Error fetching product details for ASIN ${asin}:`, error);
-            throw error;
+            console.error(`[DEBUG] Error fetching product details for ASIN ${asin}:`, error);
+            throw error; // Re-throw to be caught in scrapeAsin
         }
     }
 
     async function fetchAodMainProductDetailsPage(asin) {
-        const url = `https://www.amazon.com/gp/product/ajax/ref=dp_aod_ALL_mbc?asin=${asin}`;
+        const aodMainProductDetailsUrl = `https://www.amazon.com/gp/product/ajax/ref=dp_aod_ALL_mbc?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&experienceId=aodAjaxMain`;
+        console.log(`[DEBUG] Fetching AOD Main Product Details page: ${aodMainProductDetailsUrl}`);
+
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            return await response.text();
+            const response = await fetch(aodMainProductDetailsUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${aodMainProductDetailsUrl}`);
+            }
+            const aodMainProductDetailsHtml = await response.text();
+            return aodMainProductDetailsHtml;
         } catch (error) {
-            console.error(`Error fetching AOD Main for ASIN ${asin}:`, error);
-            throw error;
+            console.error(`[DEBUG] Error fetching AOD Main Product Details for ASIN ${asin}:`, error);
+            throw error; // Re-throw
         }
     }
 
     async function fetchAodSellerInfoPage(asin, pageNumber = 1) {
-        const url = `https://www.amazon.com/gp/product/ajax/ref=aod_page_${pageNumber}?asin=${asin}&pageno=${pageNumber}`;
+        const aodSellerInfoUrl = `https://www.amazon.com/gp/product/ajax/ref=aod_page_${pageNumber}?asin=${asin}&m=&qid=&smid=&sourcecustomerorglistid=&sourcecustomerorglistitemid=&sr=&pc=dp&isonlyrenderofferlist=true&pageno=${pageNumber}&experienceId=aodAjaxMain`;
+        console.log(`[DEBUG] Fetching AOD Seller Info page ${pageNumber}: ${aodSellerInfoUrl}`);
+
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            return await response.text();
+            const response = await fetch(aodSellerInfoUrl);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${aodSellerInfoUrl}`);
+            }
+            const aodSellerInfoHtml = await response.text();
+            return aodSellerInfoHtml;
         } catch (error) {
-            console.error(`Error fetching AOD Seller Info for ASIN ${asin} on page ${pageNumber}:`, error);
-            throw error;
+            console.error(`[DEBUG] Error fetching AOD Seller Info for ASIN ${asin} - p${pageNumber}:`, error);
+            throw error; // Re-throw
         }
     }
 
     async function fetchReviewPage(asin, reviewType, pageUrl, accumulatedReviews) {
         const filterType = reviewType === "critical" ? "critical" : "all_reviews";
         if (!pageUrl) {
-            pageUrl = `https://www.amazon.com/product-reviews/${asin}/?reviewerType=all_reviews&filterByStar=${filterType}&pageNumber=1`;
+            pageUrl = `https://www.amazon.com/product-reviews/${asin}/ref=cm_cr_arp_d_paging_btm_next_1?ie=UTF8&reviewerType=all_reviews&filterByStar=${filterType}&pageNumber=1`;
         }
-        if (!accumulatedReviews) accumulatedReviews = [];
+        if (!accumulatedReviews) {
+            accumulatedReviews = [];
+        }
+
         let currentPageNumber = 1;
         try {
             const urlParams = new URLSearchParams(new URL(pageUrl).search);
-            if (urlParams.get("pageNumber")) {
-                currentPageNumber = parseInt(urlParams.get("pageNumber"), 10);
+            const pageNumberParam = urlParams.get("pageNumber");
+            if (pageNumberParam) {
+                currentPageNumber = parseInt(pageNumberParam, 10);
             }
         } catch (error) {
-            console.warn("Could not parse pageNumber from URL:", pageUrl);
+            console.warn(`Could not parse pageNumber from URL: ${pageUrl}`, error);
         }
+
+        console.log(`[DEBUG] START fetchReviewPage - ${reviewType} - Page ${currentPageNumber}`);
+
         try {
             const response = await fetch(pageUrl);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-            const html = await response.text();
-            const parsedReviews = parseReviewsFromHtmlFragment(html);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} for URL: ${pageUrl}`);
+            }
+            const reviewHtml = await response.text();
+            const parsedReviews = parseReviewsFromHtmlFragment(reviewHtml);
             accumulatedReviews.push(...parsedReviews);
-            const nextPageLink = findNextPageLinkHrefFromFragment(html);
-            if (nextPageLink) {
-                const nextPageUrl = new URL(nextPageLink, pageUrl).href;
+
+            console.log(
+                `[DEBUG] Parsed ${parsedReviews.length} ${reviewType} reviews from page ${currentPageNumber}, total: ${accumulatedReviews.length}`
+            );
+
+            const nextPageLinkHref = findNextPageLinkHrefFromFragment(reviewHtml);
+            if (nextPageLinkHref) {
+                const nextPageUrl = new URL(nextPageLinkHref, pageUrl).href;
                 return fetchReviewPage(asin, reviewType, nextPageUrl, accumulatedReviews);
             } else {
-                return { accumulatedReviews, reviewHtml: html };
+                console.log(
+                    `[DEBUG] No more ${reviewType} review pages. Total: ${accumulatedReviews.length}`
+                );
+                return { accumulatedReviews: accumulatedReviews, reviewHtml };
             }
         } catch (error) {
-            console.error(`Error in fetchReviewPage for ${reviewType}:`, error);
-            throw error;
+            console.error(`[DEBUG] ERROR in fetchReviewPage - ${reviewType}`, error);
+            throw error; // Re-throw
+        } finally {
+            console.log(`[DEBUG] END fetchReviewPage - ${reviewType} - Page ${currentPageNumber}`);
         }
     }
 
-    function parseReviewsFromHtmlFragment(html) {
+    /********************************************************************
+     * 10. REVIEW PARSING - Functional Logic
+     ********************************************************************/
+    function parseReviewsFromHtmlFragment(htmlFragment) {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const reviews = [];
-        const reviewElements = doc.querySelectorAll('#cm_cr-review_list [data-hook="review"]');
-        reviewElements.forEach(reviewEl => {
-            reviews.push({
-                reviewerName: reviewEl.querySelector('[data-hook="review-author"]')?.textContent.trim() || null,
-                rating: reviewEl.querySelector('[data-hook="review-star-rating"] .a-icon-alt')?.textContent.trim() || null,
-                title: reviewEl.querySelector('[data-hook="review-title"]')?.textContent.trim() || null,
-                date: reviewEl.querySelector('[data-hook="review-date"]')?.textContent.trim() || null,
-                body: reviewEl.querySelector('[data-hook="review-body"]')?.textContent.trim() || null
-            });
+        const doc = parser.parseFromString(htmlFragment, "text/html");
+        let reviews = [];
+
+        const reviewElements = doc.querySelectorAll(
+            '#cm_cr-review_list [data-hook="review"]'
+        );
+        reviewElements.forEach(reviewElement => {
+            const review = {};
+            review.reviewerName =
+                reviewElement.querySelector('[data-hook="review-author"]')?.textContent.trim() ??
+                null;
+
+            const ratingElement = reviewElement.querySelector('[data-hook="review-star-rating"]');
+            if (ratingElement) {
+                const ratingText = ratingElement.querySelector(".a-icon-alt").textContent.trim();
+                const ratingMatch = ratingText.match(/(\d[,.]\d)/);
+                review.rating = ratingMatch
+                    ? parseFloat(ratingMatch[1].replace(",", "."))
+                    : null;
+            }
+            review.title =
+                reviewElement.querySelector('[data-hook="review-title"]')?.textContent.trim() ?? null;
+            review.date =
+                reviewElement.querySelector('[data-hook="review-date"]')?.textContent.trim() ?? null;
+            review.body =
+                reviewElement.querySelector('[data-hook="review-body"]')?.textContent.trim() ?? null;
+            const helpfulVotesElement = reviewElement.querySelector('[data-hook="helpful-vote-statement"]');
+            if (helpfulVotesElement) {
+                const helpfulVotesText = helpfulVotesElement.textContent.trim();
+                const helpfulVotesMatch = helpfulVotesText.match(/(\d+|One)/);
+                review.helpfulVotes = helpfulVotesMatch
+                    ? helpfulVotesMatch[1] === "One"
+                        ? 1
+                        : parseInt(helpfulVotesMatch[1], 10)
+                    : null;
+            }
+            reviews.push(review);
         });
         return reviews;
     }
 
-    function findNextPageLinkHrefFromFragment(html) {
+    function findNextPageLinkHrefFromFragment(htmlFragment) {
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const nextLink = doc.querySelector(".a-pagination .a-last:not(.a-disabled) a");
-        return nextLink ? nextLink.getAttribute("href") : null;
+        const doc = parser.parseFromString(htmlFragment, "text/html");
+        const nextPageElement = doc.querySelector(".a-pagination .a-last:not(.a-disabled) a");
+        return nextPageElement ? nextPageElement.getAttribute("href") : null;
     }
+
+    /********************************************************************
+     * 12. ASIN EXTRACTION FUNCTION - Functional Logic
+     ********************************************************************/
+    function extractAsins() {
+        const asinElements = document.querySelectorAll('div[data-asin]');
+        const asins = [];
+        asinElements.forEach(el => {
+            const asin = el.getAttribute('data-asin');
+            if (asin) asins.push(asin);
+        });
+        return asins;
+    }
+
+
+    /********************************************************************
+     * 19. CONFUSION MATRIX UPDATE FUNCTION
+     ********************************************************************/
+    function updateConfusionMatrix(tp, fp, fn, tn) {
+        document.getElementById('tp').textContent = tp;
+        document.getElementById('fp').textContent = fp;
+        document.getElementById('fn').textContent = fn;
+        document.getElementById('tn').textContent = tn;
+    }
+
 
 })();

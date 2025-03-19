@@ -13,17 +13,14 @@
     "https://www.amazon.com/*/dp/*",
     "https://www.amazon.com/dp/*"
   ],
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.amazon.com/s*",
-        "https://www.amazon.com/dp/*",
-        "https://www.amazon.com/*/dp/*"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "run_at": "document_idle"
-    }
-  ]
+"content_scripts": [
+  {
+    "matches": ["https://www.amazon.com/*"],
+    "js": [
+      "chart.js",
+      "content.js"
+    ]
+  }
+]
+
 }
