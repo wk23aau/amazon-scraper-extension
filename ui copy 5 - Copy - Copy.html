@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chooses It - Smart Shopping Assistant</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #738aff;
+            --secondary: #ff7c43;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --success: #38b000;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-main);
+            color: var(--dark);
+            background-color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .hero {
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+            min-height: 80vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            width: 50%;
+            padding: 2rem;
+            z-index: 2;
+        }
+        
+        .hero-visual {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #555;
+        }
+        
+        .gradient-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.1) 0%, rgba(255, 124, 67, 0.05) 90%);
+            z-index: 1;
+        }
+        
+        /* Search interface */
+        .search-interface {
+            width: 100%;
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            padding-left: 3.5rem;
+            border-radius: var(--border-radius);
+            border: 2px solid #e0e0e0;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            font-family: var(--font-main);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        
+        /* Autocomplete suggestions */
+        .autocomplete {
+            position: relative;
+            width: 100%;
+        }
+        
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--shadow);
+            z-index: 10;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .suggestion-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f5f7ff;
+        }
+        
+        .suggestion-item.active {
+            background-color: #f0f4ff;
+        }
+        
+        .suggestion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f5f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .suggestion-content {
+            flex: 1;
+        }
+        
+        .suggestion-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .suggestion-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Results section */
+        .results-section {
+            padding: 4rem 2rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .product-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            height: 200px;
+            width: 100%;
+            background-color: #f5f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-image img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .product-price {
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .marketplace {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rating-stars {
+            color: var(--secondary);
+        }
+        
+        .rating-count {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .product-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-primary {
+            background-color: #e6eaff;
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: #e3f5e5;
+            color: var(--success);
+        }
+        
+        .decision-factors {
+            margin-top: 1rem;
+            background-color: #f9fafc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        
+        .factor-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .factor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .factor-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .factor-icon {
+            color: var(--success);
+        }
+        
+        /* Feature comparison section */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            overflow: hidden;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table th {
+            background-color: #f5f7ff;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table td.highlighted {
+            background-color: #fffde7;
+        }
+        
+        /* Smart suggestions section */
+        .smart-suggestions {
+            padding: 4rem 2rem;
+            background-color: #f9fafc;
+        }
+        
+        .personalized-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .personalized-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        /* Features section */
+        .features-section {
+            padding: 4rem 2rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            padding: 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        /* CTA section */
+        .cta-section {
+            padding: 6rem 2rem;
+            text-align: center;
+            background-color: #f0f4ff;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-description {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 4rem 2rem;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .testimonial-card {
+            padding: 2rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .testimonial-content {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #f0f4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .author-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .author-info p {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 4rem 2rem;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-links h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #444;
+            text-align: center;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content, .hero-visual {
+                width: 100%;
+            }
+            
+            .hero-content {
+                order: 1;
+            }
+            
+            .hero-visual {
+                order: 0;
+                margin-bottom: 2rem;
+            }
+            
+            nav ul {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .auth-buttons {
+                display: none;
+            }
+            
+            .logo {
+                margin: 0 auto;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">AI</div>
+            <span>AI Chooses It</span>
+        </div>
+        
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        
+        <div class="auth-buttons">
+            <button class="btn btn-outline">Login</button>
+            <button class="btn btn-primary">Sign Up</button>
+        </div>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <div class="gradient-bg"></div>
+            
+            <div class="hero-content animated">
+                <h1>Let AI Find Your Perfect Products</h1>
+                <p>AI Chooses It uses advanced artificial intelligence to analyze your preferences and find the best products across multiple marketplaces, saving you time and ensuring you make the right purchase every time.</p>
+                
+                <button class="btn btn-primary">Get Started</button>
+            </div>
+            
+            <div class="hero-visual animated">
+                <img src="/api/placeholder/500/400" alt="AI Chooses It Platform" />
+            </div>
+        </section>
+        
+        <section class="search-interface animated">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="What are you looking for today?" value="Best noise cancelling headphones">
+            </div>
+            
+            <div class="autocomplete">
+                <div class="suggestions">
+                    <div class="suggestion-item active">
+                        <div class="suggestion-icon">🎧</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">Best noise cancelling headphones under $300</div>
+                            <div class="suggestion-meta">108 products compared across 7 marketplaces</div>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestion-item">
+                        <div class="suggestion-icon">🎧</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">Best noise cancelling headphones for traveling</div>
+                            <div class="suggestion-meta">87 products compared across 5 marketplaces</div>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestion-item">
+                        <div class="suggestion-icon">🎧</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">Best noise cancelling headphones with microphone</div>
+                            <div class="suggestion-meta">92 products compared across 6 marketplaces</div>
+                        </div>
+                    </div>
+                    
+                    <div class="suggestion-item">
+                        <div class="suggestion-icon">🎧</div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-title">Best budget noise cancelling headphones</div>
+                            <div class="suggestion-meta">75 products compared across 8 marketplaces</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="results-section">
+            <h2 class="section-title">Best Noise Cancelling Headphones Under $300</h2>
+            
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 2rem;">Our AI has analyzed 108 products across 7 marketplaces, considering 24 key factors including sound quality, battery life, comfort, and user reviews to find the perfect headphones for you.</p>
+            
+            <div class="results-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-primary">Top Pick</span>
+                            <span class="badge badge-success">Best Value</span>
+                        </div>
+                        
+                        <h3 class="product-title">Sony WH-1000XM4 Wireless Noise Cancelling Headphones</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★★</div>
+                            <span class="rating-count">(4,732 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $278.00
+                            <span style="color: #38b000; font-size: 0.9rem; font-weight: 500;">-7% off</span>
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Amazon">
+                            <span>Amazon</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Why AI Chose This</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Industry-leading noise cancellation</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>30-hour battery life (top 5%)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Premium sound quality (92/100 rating)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Highest user satisfaction (4.8/5)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-primary">Runner Up</span>
+                        </div>
+                        
+                        <h3 class="product-title">Bose QuietComfort 45 Bluetooth Wireless Headphones</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★☆</div>
+                            <span class="rating-count">(3,245 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $299.00
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Best Buy">
+                            <span>Best Buy</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Why AI Chose This</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Superior comfort (9.3/10 rating)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Excellent noise cancellation (88/100)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>24-hour battery life</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>High durability score (8.9/10)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-success">Best Budget</span>
+                        </div>
+                        
+                        <h3 class="product-title">Anker Soundcore Life Q30 Hybrid Active Noise Cancelling Headphones</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★☆</div>
+                            <span class="rating-count">(2,876 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $79.99
+                            <span style="color: #38b000; font-size: 0.9rem; font-weight: 500;">-20% off</span>
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Amazon">
+                            <span>Amazon</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Why AI Chose This</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Best value for price (94/100)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>40-hour battery life (top 1%)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Decent noise cancellation (75/100)</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>High customer satisfaction (4.5/5)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 3rem; text-align: center;">
+                <h3 style="margin-bottom: 2rem;">Feature Comparison</h3>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>Sony WH-1000XM4</th>
+                            <th>Bose QuietComfort 45</th>
+                            <th>Anker Soundcore Life Q30</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Noise Cancellation</td>
+                            <td class="highlighted">Excellent (92/100)</td>
+                            <td>Very Good (88/100)</td>
+                            <td>Good (75/100)</td>
+                        </tr>
+                        <tr>
+                            <td>Battery Life</td>
+                            <td>30 hours</td>
+                            <td>24 hours</td>
+                            <td class="highlighted">40 hours</td>
+                        </tr>
+                        <tr>
+                            <td>Sound Quality</td>
+                            <td class="highlighted">Excellent (92/100)</td>
+                            <td>Very Good (86/100)</td>
+                            <td>Good (78/100)</td>
+                        </tr>
+						<tr>
+                            <td>Comfort</td>
+                            <td>Very Good (8.8/10)</td>
+                            <td class="highlighted">Excellent (9.3/10)</td>
+                            <td>Good (7.6/10)</td>
+                        </tr>
+                        <tr>
+                            <td>Portability</td>
+                            <td>Foldable, Case included</td>
+                            <td>Foldable, Case included</td>
+                            <td>Foldable, Case included</td>
+                        </tr>
+                        <tr>
+                            <td>Connectivity</td>
+                            <td class="highlighted">Bluetooth 5.0, Multipoint</td>
+                            <td>Bluetooth 5.1</td>
+                            <td>Bluetooth 5.0</td>
+                        </tr>
+                        <tr>
+                            <td>Weight</td>
+                            <td>8.96 oz</td>
+                            <td>8.5 oz</td>
+                            <td class="highlighted">7.8 oz</td>
+                        </tr>
+                        <tr>
+                            <td>Price</td>
+                            <td>$278.00</td>
+                            <td>$299.00</td>
+                            <td class="highlighted">$79.99</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section class="smart-suggestions">
+            <div class="personalized-title">
+                <div class="personalized-icon">💡</div>
+                <h2 class="section-title">Smart Suggestions Based on Your Search</h2>
+            </div>
+            
+            <div class="results-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-primary">Related Pick</span>
+                        </div>
+                        
+                        <h3 class="product-title">Apple AirPods Pro (2nd generation)</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★★</div>
+                            <span class="rating-count">(5,832 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $249.00
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Apple">
+                            <span>Apple Store</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Based on Your Interest</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Similar noise cancellation quality</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>More portable earbuds alternative</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-primary">Accessory</span>
+                        </div>
+                        
+                        <h3 class="product-title">Headphone Stand with USB Charger</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★☆</div>
+                            <span class="rating-count">(1,243 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $35.99
+                            <span style="color: #38b000; font-size: 0.9rem; font-weight: 500;">-15% off</span>
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Amazon">
+                            <span>Amazon</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Recommended Add-on</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Perfect companion for your headphones</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Includes built-in USB charging</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="/api/placeholder/200/200" alt="Product Image">
+                    </div>
+                    
+                    <div class="product-info">
+                        <div class="product-badges">
+                            <span class="badge badge-primary">Trending</span>
+                        </div>
+                        
+                        <h3 class="product-title">Portable Headphone Carrying Case</h3>
+                        
+                        <div class="rating">
+                            <div class="rating-stars">★★★★☆</div>
+                            <span class="rating-count">(879 reviews)</span>
+                        </div>
+                        
+                        <div class="product-price">
+                            $24.99
+                        </div>
+                        
+                        <div class="marketplace">
+                            <img src="/api/placeholder/20/20" alt="Amazon">
+                            <span>Amazon</span>
+                        </div>
+                        
+                        <div class="decision-factors">
+                            <div class="factor-title">Frequently Bought Together</div>
+                            <div class="factor-list">
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Waterproof & shock resistant</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon">✓</span>
+                                    <span>Compatible with all featured headphones</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <h2 class="section-title">Why Choose AI Chooses It</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3 class="feature-title">Comprehensive Analysis</h3>
+                    <p>Our AI analyzes thousands of products across dozens of marketplaces to find the best options based on real data, not paid placements.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Time-Saving</h3>
+                    <p>Skip hours of research and reading reviews. Our platform consolidates all relevant information and provides you with clear recommendations in seconds.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💸</div>
+                    <h3 class="feature-title">Price Monitoring</h3>
+                    <p>We track prices across multiple retailers and alert you when there's a drop in price for items you're interested in.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3 class="feature-title">Personalized Recommendations</h3>
+                    <p>The more you use our platform, the better our AI understands your preferences, delivering increasingly tailored product suggestions.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Transparent Decision Making</h3>
+                    <p>We always show you exactly why our AI selected each product, with detailed breakdowns of the factors considered in each recommendation.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Unbiased Results</h3>
+                    <p>Unlike many review sites, we don't accept payments for product placement. Our AI's only goal is to find the best products for you.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="testimonials">
+            <h2 class="section-title">What Our Users Say</h2>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "I was spending hours researching products before making purchases. AI Chooses It has saved me so much time and actually led me to better products than I would have found on my own!"
+                    </div>
+                    
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JS</div>
+                        <div class="author-info">
+                            <h4>Jennifer S.</h4>
+                            <p>Tech Enthusiast</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "The transparent breakdown of why each product was selected really helped me make confident buying decisions. I love that I can see exactly why the AI recommended each item."
+                    </div>
+                    
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MJ</div>
+                        <div class="author-info">
+                            <h4>Michael J.</h4>
+                            <p>Online Shopper</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "The price alerts have saved me hundreds of dollars! I add items to my watchlist and get notified when there's a price drop. It's like having a personal shopping assistant."
+                    </div>
+                    
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AR</div>
+                        <div class="author-info">
+                            <h4>Amanda R.</h4>
+                            <p>Budget Shopper</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <h2 class="cta-title">Start Shopping Smarter Today</h2>
+            <p class="cta-description">Join thousands of smart shoppers who use AI Chooses It to find the best products at the best prices, with zero effort.</p>
+            
+            <div class="cta-buttons">
+                <button class="btn btn-primary">Sign Up - It's Free</button>
+                <button class="btn btn-outline">Learn More</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-links">
+                <div class="footer-logo">
+                    <div class="logo-icon" style="width: 30px; height: 30px; font-size: 0.8rem;">AI</div>
+                    <span>AI Chooses It</span>
+                </div>
+                
+                <p style="color: #bbb; margin-bottom: 1rem;">Intelligent shopping decisions powered by AI.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Use Cases</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Guides</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                    <li><a href="#">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 AI Chooses It. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Simple script to handle the autocomplete suggestions
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            const suggestions = document.querySelector('.suggestions');
+            
+            searchInput.addEventListener('focus', function() {
+                suggestions.style.display = 'block';
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+                    suggestions.style.display = 'none';
+                }
+            });
+            
+            const suggestionItems = document.querySelectorAll('.suggestion-item');
+            suggestionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    searchInput.value = this.querySelector('.suggestion-title').textContent;
+                    suggestions.style.display = 'none';
+                    
+                    // Add active class to clicked suggestion
+                    suggestionItems.forEach(si => si.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

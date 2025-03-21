@@ -11,11 +11,14 @@
   "host_permissions": [
     "https://www.amazon.com/*",
     "https://www.amazon.com/*/dp/*",
-    "https://www.amazon.com/dp/*"
+    "https://www.amazon.com/dp/*",
+    "https://www.amazon.co.uk/*",
+    "https://www.amazon.co.uk/*/dp/*",
+    "https://www.amazon.co.uk/dp/*"
   ],
 "content_scripts": [
   {
-    "matches": ["https://www.amazon.com/*"],
+    "matches": ["https://www.amazon.com/*","https://www.amazon.co.uk/*"],
     "js": [
       "chart.js",
       "content.js"

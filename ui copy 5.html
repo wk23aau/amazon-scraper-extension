@@ -1,163 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI Comparative Analysis Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chooses It - Intelligent Shopping Reimagined</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #4a69bd;
+            --accent: #8e44ad;
+            --neon: #66d9ef;
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f3f4f6;
-      margin: 0; padding: 0;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .widget {
-      position: fixed; border-radius: 16px;
-      background: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      overflow: hidden; z-index: 999;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
 
-    .header {
-      background: #4f46e5; color: #fff;
-      padding: 14px; cursor: grab; font-weight: 600;
-    }
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    .content { padding: 14px; }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            transform: translateY(25%);
+        }
 
-    .model {
-      background: #f9fafb; border-radius: 8px;
-      padding: 10px; margin-bottom: 10px;
-    }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
 
-    .confidence-bar {
-      background: #e5e7eb; border-radius: 4px; height: 6px; overflow: hidden; margin-top: 4px;
-    }
+        .search-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .confidence-fill { height: 100%; transition: width 0.4s ease; }
+        .search-input {
+            width: 100%;
+            padding: 1.5rem 2rem;
+            border-radius: 30px;
+            border: 2px solid var(--neon);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
 
-    details {
-      margin-top: 10px; cursor: pointer; color: #6366f1;
-    }
+        .search-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: var(--neon);
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
 
-    button {
-      background: #6366f1; color: #fff; padding: 8px 14px;
-      border: none; border-radius: 6px; cursor: pointer; margin: 5px;
-    }
+        /* Features Section */
+        .features {
+            padding: 6rem 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    button:hover { background: #4f46e5; }
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: transform 0.3s;
+            text-align: center;
+        }
 
-    canvas { max-height: 150px; }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
 
-    /* Scrollbar Styling */
-    .content::-webkit-scrollbar { width: 6px; }
-    .content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--neon);
+        }
 
-    /* Positioning widgets */
-    #predictionWidget { bottom: 20px; right: 20px; width: 350px; }
-    #reviewCarousel { bottom: 20px; left: 20px; width: 650px; }
-  </style>
+        /* Demo Section */
+        .demo-section {
+            background: rgba(0,0,0,0.2);
+            padding: 4rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .demo-widget {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        /* Trust Section */
+        .trust-section {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .security-badges {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .marquee {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 2rem 0;
+        }
+
+        .marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%) }
+            100% { transform: translateX(-100%) }
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem;
+            background: rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <nav style="position: absolute; top: 0; width: 100%; padding: 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 3;">
+            <div class="logo" style="font-weight: bold; font-size: 1.5rem;">AI Chooses It</div>
+            <button class="cta" style="background: var(--neon); border: none; padding: 1rem 2rem; border-radius: 25px; cursor: pointer;">Get Started</button>
+        </nav>
+        
+        <div class="hero-content">
+            <h1>Your AI-Powered Shopping Concierge</h1>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="What are you looking for?">
+                <button class="search-btn">Find My Products</button>
+            </div>
+        </div>
+        
+        <canvas id="ai-orb" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;"></canvas>
+    </section>
 
-<!-- Prediction Widget -->
-<div class="widget" id="predictionWidget">
-  <div class="header">Model Predictions 🤖</div>
-  <div class="content">
-    <div class="model">
-      <strong>Transformer (BERT)</strong>
-      <div>Prediction: Positive 😊</div>
-      <div class="confidence-bar">
-        <div class="confidence-fill" style="width:88%; background:#10b981;"></div>
-      </div>
-      <details><summary>View Explanation</summary><p>Influential tokens listed here.</p></details>
-    </div>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <i class="fas fa-brain feature-icon"></i>
+            <h3>Hyper-Personalized Recommendations</h3>
+            <p>Advanced AI learns your preferences across 100+ parameters</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-globe feature-icon"></i>
+            <h3>Cross-Platform Integration</h3>
+            <p>Shop seamlessly across Amazon, eBay, and 50+ marketplaces</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-chart-line feature-icon"></i>
+            <h3>Smart Price Tracking</h3>
+            <p>Real-time price monitoring with predictive alerts</p>
+        </div>
+    </section>
 
-    <div class="model">
-      <strong>Logistic Regression</strong>
-      <div>Prediction: Negative 🙁</div>
-      <div class="confidence-bar">
-        <div class="confidence-fill" style="width:62%; background:#ef4444;"></div>
-      </div>
-      <details><summary>View Explanation</summary><p>Top features explained here.</p></details>
-    </div>
-  </div>
-</div>
+    <!-- Demo Section -->
+    <section class="demo-section">
+        <div class="demo-widget">
+            <h2 style="margin-bottom: 1rem;">Live Product Match</h2>
+            <div style="display: flex; gap: 1rem; overflow-x: auto; padding: 1rem;">
+                <div style="min-width: 200px; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%2366d9ef' d='M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z'/%3E%3C/svg%3E" alt="product" style="width: 100px; margin: 0 auto;">
+                    <h4>Wireless Earbuds</h4>
+                    <p style="font-size: 0.9rem;">98% Match</p>
+                </div>
+                <!-- Repeat for other product placeholders -->
+            </div>
+        </div>
+        
+        <button style="padding: 1rem 3rem; background: var(--neon); border: none; border-radius: 25px; cursor: pointer;">
+            Take the Style Quiz
+        </button>
+    </section>
 
-<!-- Review Carousel with Graph -->
-<div class="widget" id="reviewCarousel">
-  <div class="header">User Reviews & Confidence Trends 📈</div>
-  <div class="content">
-    <div id="reviewText">"This product exceeded my expectations! Highly recommended."</div>
-    <canvas id="confidenceGraph"></canvas>
-    <div style="text-align:center;">
-      <button onclick="prevReview()">← Prev</button>
-      <button onclick="nextReview()">Next →</button>
-    </div>
-  </div>
-</div>
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <div class="security-badges">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24'%3E%3Cpath fill='%2366d9ef' d='M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8 8-3.59 8-8-3.59-8-8-8zm-1 13h2v-6h-2v6zm0-8h2V9h-2v2z'/%3E%3C/svg%3E" alt="GDPR">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24'%3E%3Cpath fill='%2366d9ef' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-6h2v-4h-2v4zm0-6h2v4h-2V8z'/%3E%3C/svg%3E" alt="Encryption">
+        </div>
+        
+        <div class="marquee">
+            <span>
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%2366d9ef' d='M0 0h24v24H0z'/%3E%3C/svg%3E" alt="Partner" style="margin: 0 2rem;">
+                <!-- Repeat partner logos as SVG placeholders -->
+            </span>
+        </div>
+    </section>
 
-<script>
-const reviews = [
-  {text:"Exceeded my expectations!",bert:88,logistic:62},
-  {text:"Delivery was slow but quality good.",bert:75,logistic:55},
-  {text:"Disappointed; not as described.",bert:40,logistic:30},
-  {text:"Great value, will buy again.",bert:85,logistic:80},
-  {text:"Average performance, expected better.",bert:50,logistic:45}
-];
+    <footer>
+        <p>© 2025 AI Chooses It</p>
+        <div style="margin: 1rem 0;">
+            <a href="#" style="color: var(--neon); margin: 0 1rem;"><i class="fab fa-twitter"></i></a>
+            <a href="#" style="color: var(--neon); margin: 0 1rem;"><i class="fab fa-instagram"></i></a>
+            <a href="#" style="color: var(--neon); margin: 0 1rem;"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p style="font-size: 0.8rem;">Patent-pending AI recommendation technology</p>
+    </footer>
 
-let currentReview = 0;
+    <!-- Three.js for 3D Orb -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const canvas = document.getElementById('ai-orb');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
 
-const ctx = document.getElementById('confidenceGraph').getContext('2d');
-const graphData = {
-  labels: ['Review 1'],
-  datasets: [
-    { label: 'BERT', data: [reviews[0].bert], borderColor:'#10b981', tension:0.4 },
-    { label: 'Logistic Regression', data: [reviews[0].logistic], borderColor:'#ef4444', tension:0.4 }
-  ]
-};
+        const geometry = new THREE.SphereGeometry(1, 64, 64);
+        const material = new THREE.MeshPhongMaterial({
+            color: 0x66d9ef,
+            shininess: 100,
+            transparent: true,
+            opacity: 0.6
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
 
-const confidenceChart = new Chart(ctx, { type: 'line', data: graphData, options: { scales: { y:{ min:0,max:100 } }}});
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        scene.add(light);
 
-function updateReview(index){
-  document.getElementById('reviewText').textContent=`"${reviews[index].text}"`;
-  const lbl=`Review ${index+1}`;
-  if(!graphData.labels.includes(lbl)){
-    graphData.labels.push(lbl);
-    graphData.datasets[0].data.push(reviews[index].bert);
-    graphData.datasets[1].data.push(reviews[index].logistic);
-  }
-  confidenceChart.update();
-}
+        camera.position.z = 5;
 
-function nextReview(){
-  currentReview=(currentReview+1)%reviews.length;
-  updateReview(currentReview);
-}
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            sphere.rotation.x += 0.005;
+            sphere.rotation.y += 0.005;
+            
+            // Pulsating effect
+            const scale = Math.sin(Date.now() * 0.001) * 0.1 + 1;
+            sphere.scale.set(scale, scale, scale);
+            
+            renderer.render(scene, camera);
+        }
 
-function prevReview(){
-  currentReview=(currentReview-1+reviews.length)%reviews.length;
-  updateReview(currentReview);
-}
+        animate();
 
-// Draggable Widgets
-document.querySelectorAll('.widget').forEach(w=>{
-  let isDragging=false,offsetX,offsetY;
-  const header=w.querySelector('.header');
-  header.onmousedown=e=>{
-    isDragging=true;
-    offsetX=e.clientX-w.offsetLeft;
-    offsetY=e.clientY-w.offsetTop;
-  };
-  document.onmousemove=e=>{
-    if(!isDragging)return;
-    w.style.top=`${e.clientY-offsetY}px`;
-    w.style.left=`${e.clientX-offsetX}px`;
-  };
-  document.onmouseup=()=>isDragging=false;
-});
-</script>
-
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    
+    <!-- Search Interactivity -->
+    <script>
+        const searchInput = document.querySelector('.search-input');
+        
+        searchInput.addEventListener('input', (e) => {
+            // Simulated AI suggestions
+            const suggestions = [
+                "Wireless Headphones",
+                "Smart Fitness Tracker",
+                "Ergonomic Office Chair",
+                "Premium Coffee Machine"
+            ].filter(item => item.toLowerCase().includes(e.target.value.toLowerCase()));
+            
+            // Simple suggestion display (for demo purposes)
+            console.log('Suggestions:', suggestions);
+        });
+    </script>
 </body>
 </html>
