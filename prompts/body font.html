@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Define Brand Typography: Body Font - xperienced.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Nunito:wght@400;700&family=Oswald:wght@400;700&family=Poppins:wght@400;700&family=мерривезер:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Roboto:wght@400;700&family=Slabo+27px&display=swap" rel="stylesheet"> <!-- Example Font Choices - Google Fonts - Added Body Fonts -->
+    <style>
+        /*  Assuming Primary and Secondary Colors and Heading Font are defined */
+        :root {
+            --primary-color: #007bff; /* Example Tech Blue */
+            --secondary-color: #6c757d; /* Example Gray */
+            --heading-font-family: 'Oswald', sans-serif; /* Example Heading Font (Modern, Bold) - From previous step */
+            --body-font-family: 'Nunito', sans-serif; /* Default - Example Body Font (Friendly) */
+        }
+
+        body {
+            font-family: var(--body-font-family); /* Apply body font to the whole body */
+            margin: 20px;
+            line-height: 1.7; /* Slightly increased line height for body text readability */
+            color: #444; /* Slightly lighter default text color for body text */
+            -webkit-font-smoothing: antialiased; /* Better font rendering for webkit browsers */
+            -moz-osx-font-smoothing: grayscale; /* Better font rendering for Firefox on macOS */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--heading-font-family);
+            color: #222;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+        }
+
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.75em; }
+        h4 { font-size: 1.5em; }
+        h5 { font-size: 1.25em; }
+        h6 { font-size: 1em; }
+
+        p { margin-bottom: 1em; } /* Add spacing between paragraphs */
+
+
+        /*  Example Body Font Styles - To preview different options */
+
+        .body-font-nunito { font-family: 'Nunito', sans-serif; } /* Friendly, Rounded Sans-Serif */
+        .body-font-open-sans { font-family: 'Open Sans', sans-serif; } /* Highly Readable, Neutral Sans-Serif */
+        .body-font-lato { font-family: 'Lato', sans-serif; } /* Modern, Clean, Readable Sans-Serif */
+        .body-font-roboto { font-family: 'Roboto', sans-serif; } /* Versatile, System Font-like Sans-Serif */
+        .body-font-slabo { font-family: 'Slabo 27px', serif; } /* Slab Serif, Readable, Slightly More Character */
+
+
+        /*  Keep basic styles from previous steps for context */
+        .nav-bar { background-color: white; border-bottom: 2px solid var(--primary-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo a { color: var(--primary-color); font-family: var(--heading-font-family); font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-link { color: #333; padding: 8px 15px; border-radius: 3px; text-decoration: none; margin-left: 10px; transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: var(--primary-color); }
+        .btn-primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+
+
+    </style>
+</head>
+<body>
+
+    <header class="nav-bar">
+        <div class="logo">
+            <a href="/">xperienced.ai</a>
+        </div>
+        <nav>
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="#" class="nav-link">Services</a>
+            <a href="#" class="nav-link">Contact</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 20px;">
+        <section>
+            <h1>Choosing Your Body Font for xperienced.ai</h1>
+            <p>The body font is essential for readability and user experience, as it will be used for the majority of the text content on your website. It should be comfortable to read for extended periods and complement your chosen heading font.</p>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2>Example Body Font: Nunito (Friendly, Rounded Sans-Serif)</h2>
+                <p class="body-font-nunito">This is an example paragraph using the Nunito font. Nunito is a sans-serif font with rounded terminals, giving it a friendly and approachable feel. It's very readable and works well for websites aiming for a user-friendly and less formal tone. It pairs nicely with bolder, more geometric heading fonts.</p>
+                <p class="body-font-nunito">To use this, we set <code>--body-font-family: 'Nunito', sans-serif;</code> in our CSS <code>:root</code> and apply <code>font-family: var(--body-font-family);</code> to the <code>body</code> element.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="body-font-open-sans">Example Body Font: Open Sans (Highly Readable, Neutral Sans-Serif)</h2>
+                <p class="body-font-open-sans">This is an example paragraph using the Open Sans font. Open Sans is a classic, highly readable sans-serif font. It's very neutral and versatile, making it a safe and excellent choice for body text. It's known for its clarity and works well in a wide range of designs, from minimalist to more complex layouts.</p>
+                <p class="body-font-open-sans">To use this, we would change <code>--body-font-family: 'Open Sans', sans-serif;</code> in CSS.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="body-font-lato">Example Body Font: Lato (Modern, Clean, Readable Sans-Serif)</h2>
+                <p class="body-font-lato">This is an example paragraph using the Lato font. Lato is a modern and clean sans-serif font that is also very readable. It has a slightly more geometric structure than Open Sans, giving it a bit more personality while still maintaining excellent readability. It's a good choice for a contemporary and professional look.</p>
+                <p class="body-font-lato">To use this, set <code>--body-font-family: 'Lato', sans-serif;</code> in your CSS.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="body-font-roboto">Example Body Font: Roboto (Versatile, System Font-like Sans-Serif)</h2>
+                <p class="body-font-roboto">This is an example paragraph using the Roboto font. Roboto is a very versatile sans-serif font developed by Google. It's designed to be modern, approachable, and work well across different devices and screen sizes. It has a slightly more mechanical feel than some other sans-serifs, but is still highly readable and widely used.</p>
+                <p class="body-font-roboto">To use this, set <code>--body-font-family: 'Roboto', sans-serif;</code> in your CSS.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="body-font-slabo">Example Body Font: Slabo 27px (Slab Serif - Readable, Characterful)</h2>
+                <p class="body-font-slabo">This is an example paragraph using the Slabo 27px font. Slabo 27px is a slab serif font specifically designed for body text at 27px size (hence the name, though it can be used at other sizes). Slab serif fonts have a slightly more vintage or traditional feel than sans-serifs, but Slabo 27px is designed for screen readability and can add a touch of unique character to your website if you want something a bit different from typical sans-serif body fonts.</p>
+                <p class="body-font-slabo">To use this, set <code>--body-font-family: 'Slabo 27px', serif;</code> in your CSS.</p>
+            </section>
+
+
+            <h2 style="margin-top: 40px;">Your Task: Choose a Body Font</h2>
+            <p><b>Select a body font for xperienced.ai.</b> Consider:</p>
+            <ul>
+                <li>Readability and comfort for long blocks of text.</li>
+                <li>How well it pairs with your chosen heading font.  Do they create a harmonious contrast?</li>
+                <li>The overall brand style and tone you want to convey (minimalist, tech-focused, friendly, professional, etc.).</li>
+                <li>Browse Google Fonts (fonts.google.com) and other font resources for even more options.</li>
+                <li>Experiment by changing the <code>--body-font-family</code> variable in the CSS to see different fonts in action and read the example paragraphs.</li>
+            </ul>
+
+            <p>Once you've made your choice, let me know the font name (e.g., "I choose Open Sans for the body font") and we'll move on to the next prompt: designing a favicon.</p>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 xperienced.ai - Body Font Selection</p>
+    </footer>
+
+</body>
+</html>

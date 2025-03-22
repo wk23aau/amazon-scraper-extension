@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .wishlist-item {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .wishlist-item-img {
+            height: 160px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .wishlist-item-img img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .wishlist-item-info {
+            padding: 1rem;
+        }
+
+        .wishlist-item-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .wishlist-item-price {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/laptops" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="/deals" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">My Wishlist</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Wishlist Item 1 -->
+            <div class="wishlist-item">
+                <div class="wishlist-item-img">
+                    <img src="/api/placeholder/200/150" alt="Wishlist Product 1">
+                </div>
+                <div class="wishlist-item-info">
+                    <h3 class="wishlist-item-name">Dell XPS 13</h3>
+                    <p class="wishlist-item-price">$1,299</p>
+                    <div class="flex space-x-4">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                        </button>
+                        <button class="px-4 py-2 bg-red-200 text-red-700 rounded-md text-sm hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <i class="far fa-trash-alt mr-2"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wishlist Item 2 -->
+            <div class="wishlist-item">
+                <div class="wishlist-item-img">
+                    <img src="/api/placeholder/200/150" alt="Wishlist Product 2">
+                </div>
+                <div class="wishlist-item-info">
+                    <h3 class="wishlist-item-name">Samsung Galaxy S24 Ultra</h3>
+                    <p class="wishlist-item-price">$1,299</p>
+                    <div class="flex space-x-4">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                        </button>
+                        <button class="px-4 py-2 bg-red-200 text-red-700 rounded-md text-sm hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <i class="far fa-trash-alt mr-2"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wishlist Item 3 -->
+            <div class="wishlist-item">
+                <div class="wishlist-item-img">
+                    <img src="/api/placeholder/200/150" alt="Wishlist Product 3">
+                </div>
+                <div class="wishlist-item-info">
+                    <h3 class="wishlist-item-name">LG OLED C3 65-inch TV</h3>
+                    <p class="wishlist-item-price">$1,799</p>
+                    <div class="flex space-x-4">
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                        </button>
+                        <button class="px-4 py-2 bg-red-200 text-red-700 rounded-md text-sm hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <i class="far fa-trash-alt mr-2"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add more wishlist items here -->
+
+        </div>
+
+        <div class="mt-8 text-center" id="empty-wishlist" style="display:none;">
+            <p class="text-gray-700">Your wishlist is empty.</p>
+            <a href="/deals" class="text-blue-600 hover:underline">Check out our deals!</a>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/laptops">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="/deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wishlistItems = document.querySelectorAll('.wishlist-item');
+            const emptyWishlistSection = document.getElementById('empty-wishlist');
+
+            if(wishlistItems.length === 0) {
+                emptyWishlistSection.style.display = 'block';
+            } else {
+                emptyWishlistSection.style.display = 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>

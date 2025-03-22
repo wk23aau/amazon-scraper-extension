@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQs - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .faq-question.active::after {
+            content: '-';
+        }
+
+        .faq-answer {
+            color: var(--gray);
+            line-height: 1.6;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding-bottom 0.3s ease-out;
+            padding-bottom: 0;
+        }
+
+        .faq-answer.active {
+            max-height: 500px; /* Adjust as needed, or use a more dynamic approach */
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/laptops" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="/deals" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section class="bg-white shadow-md rounded-lg p-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Frequently Asked Questions</h1>
+            <p class="text-gray-700 leading-relaxed mb-8">
+                Have questions? We've got answers! Browse our FAQs below to find quick solutions and information about xperienced.ai. If you can't find what you're looking for, please <a href="/contact" class="text-blue-600 hover:underline">contact us</a>.
+            </p>
+
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What is xperienced.ai and how does it work?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>xperienced.ai is an AI-powered platform designed to help you find the perfect electronics. Our system analyzes product specifications, benchmark data, and customer reviews to provide you with personalized recommendations and comparisons. Simply search for what you need, and our AI will guide you to the best options.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is xperienced.ai free to use?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, xperienced.ai is completely free to use for everyone. You can search, compare products, and view recommendations without any charges or subscriptions.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How accurate are the product recommendations?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We strive for high accuracy in our recommendations. Our AI model is continuously learning and improving by analyzing vast amounts of data. However, recommendations are suggestions, and we encourage users to review the detailed comparison tables and product information to make their own informed decisions.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can I compare products side-by-side?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, product comparison is a core feature of xperienced.ai. When you search for a product or browse categories, you'll be able to compare up to four products side-by-side, viewing key specifications, metrics, and customer review excerpts in an easy-to-read table.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Where do you get your product information and reviews from?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We aggregate product information from manufacturer websites, retailers, and publicly available databases. Customer reviews are collected from various e-commerce platforms and review sites. We aim to provide a comprehensive and unbiased view by drawing from diverse sources.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Do you sell electronics directly?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No, xperienced.ai is a recommendation and comparison platform. We do not sell electronics directly. We provide information and links to retailers where you can purchase the products. Our goal is to help you find the best products and deals, and then direct you to trusted sellers.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 7 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How do I provide feedback or report an issue?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We welcome your feedback! Please visit our <a href="/contact" class="text-blue-600 hover:underline">Contact Us</a> page to send us a message. You can also use this page to report any issues or errors you encounter on the website.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 8 -->
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is my personal data safe with xperienced.ai?</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we take your privacy seriously. Please review our <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a> for detailed information on how we protect your personal data. We are committed to ensuring your data is safe and secure.</p>
+                    </div>
+                </div>
+
+                <!-- Add more FAQ items here -->
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/laptops">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="/deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#" class="font-medium hover:text-white">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    question.classList.toggle('active');
+                    answer.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

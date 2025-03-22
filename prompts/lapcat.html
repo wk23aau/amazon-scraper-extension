@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laptops - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .product-img {
+            height: 200px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .product-img img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .product-specs {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .filter-section {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-checkbox {
+            margin-right: 0.5rem;
+        }
+        .sort-options {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sort-label {
+            margin-right: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            appearance: none; /* Remove default arrow in some browsers */
+            -webkit-appearance: none; /* For Safari and Chrome */
+            -moz-appearance: none; /* For Firefox */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: calc(100% - 0.5rem);
+            background-position-y: center;
+            padding-right: 2rem;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="https://www.svgrepo.com/show/512448/artificial-intelligence-2.svg" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="/deals" class="text-gray-700 hover:text-blue-600">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Category Breadcrumb -->
+        <div class="mb-4 text-sm text-gray-500">
+            <a href="/" class="text-blue-600 hover:underline">Home</a> /
+            <span class="font-medium">Laptops</span>
+        </div>
+
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Filters Sidebar -->
+            <aside class="md:col-span-1">
+                <div class="bg-white shadow-md rounded-lg p-6 sticky top-8">
+                    <div class="filter-section">
+                        <h3 class="filter-title">Brand</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Apple</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Dell</label>
+                            <label><input type="checkbox" class="filter-checkbox"> HP</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Lenovo</label>
+                            <label><input type="checkbox" class="filter-checkbox"> ASUS</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Acer</label>
+                            <label><input type="checkbox" class="filter-checkbox"> MSI</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Price Range</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Under $800</label>
+                            <label><input type="checkbox" class="filter-checkbox"> $800 - $1200</label>
+                            <label><input type="checkbox" class="filter-checkbox"> $1200 - $1800</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Over $1800</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Screen Size</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Under 13 inches</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 13 - 14 inches</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 14 - 16 inches</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 16 inches & Above</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">CPU Brand</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Intel</label>
+                            <label><input type="checkbox" class="filter-checkbox"> AMD</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">RAM</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> 8GB</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 16GB</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 32GB</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 64GB & Above</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Storage Type</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> SSD</label>
+                            <label><input type="checkbox" class="filter-checkbox"> HDD</label>
+                            <label><input type="checkbox" class="filter-checkbox"> SSD + HDD</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Graphics Card</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Integrated Graphics</label>
+                            <label><input type="checkbox" class="filter-checkbox"> NVIDIA GeForce RTX</label>
+                            <label><input type="checkbox" class="filter-checkbox"> AMD Radeon RX</label>
+                        </div>
+                    </div>
+
+                     <div class="filter-section">
+                        <h3 class="filter-title">Type</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Gaming Laptop</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Ultrabook</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Workstation</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 2-in-1 Convertible</label>
+                        </div>
+                    </div>
+
+
+                    <!-- More filters can be added here -->
+                </div>
+            </aside>
+
+            <!-- Product Listing -->
+            <section class="md:col-span-3">
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">Laptops</h1>
+
+                <div class="sort-options">
+                    <label for="sort" class="sort-label">Sort By:</label>
+                    <select id="sort" class="sort-select">
+                        <option value="relevance">Relevance</option>
+                        <option value="price-low-high">Price (Low to High)</option>
+                        <option value="price-high-low">Price (High to Low)</option>
+                        <option value="rating">Customer Rating</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Product Card 1 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/MacBook_Pro_14_and_16_2021.jpg/800px-MacBook_Pro_14_and_16_2021.jpg" alt="Laptop 1">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">MacBook Pro 14-inch</h3>
+                            <p class="product-specs">Apple M3 Pro, 16GB RAM, 1TB SSD</p>
+                            <p class="product-price">$2,499</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 2 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Dell_XPS_15_9520_%282022%29.jpg/800px-Dell_XPS_15_9520_%282022%29.jpg" alt="Laptop 2">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Dell XPS 15</h3>
+                            <p class="product-specs">Intel Core i9, 32GB RAM, 1TB SSD</p>
+                            <p class="product-price">$2,199</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 3 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/HP_Spectre_X360_14_%282023%29.png/800px-HP_Spectre_X360_14_%282023%29.png" alt="Laptop 3">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">HP Spectre x360 14</h3>
+                            <p class="product-specs">Intel Core i7, 16GB RAM, 512GB SSD</p>
+                            <p class="product-price">$1,699</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 4 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Lenovo_ThinkPad_X1_Carbon_G11.jpg/800px-Lenovo_ThinkPad_X1_Carbon_G11.jpg" alt="Laptop 4">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Lenovo ThinkPad X1 Carbon</h3>
+                            <p class="product-specs">Intel Core i7, 16GB RAM, 512GB SSD</p>
+                            <p class="product-price">$1,849</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 5 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Asus-Zenbook-UX430UA.jpg/800px-Asus-Zenbook-UX430UA.jpg" alt="Laptop 5">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">ASUS ZenBook 14 OLED</h3>
+                            <p class="product-specs">Intel Core i5, 8GB RAM, 512GB SSD</p>
+                            <p class="product-price">$1,249</p>
+                        </div>
+                    </div>
+
+                    <!-- Product Card 6 -->
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Acer_Swift_3_%28SF314-43%29.jpg/800px-Acer_Swift_3_%28SF314-43%29.jpg" alt="Laptop 6">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Acer Swift 3</h3>
+                            <p class="product-specs">AMD Ryzen 7, 8GB RAM, 512GB SSD</p>
+                            <p class="product-price">$999</p>
+                        </div>
+                    </div>
+
+                    <!-- More product cards -->
+                     <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/MSI_Raider_GE78_HX_13V.jpg/800px-MSI_Raider_GE78_HX_13V.jpg" alt="Laptop 7">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">MSI Raider GE78 HX</h3>
+                            <p class="product-specs">Intel Core i9, RTX 4090, 64GB RAM, 2TB SSD, Gaming</p>
+                            <p class="product-price">$4,299</p>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Razer_Blade_16_%282023%29.jpg/800px-Razer_Blade_16_%282023%29.jpg" alt="Laptop 8">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Razer Blade 16</h3>
+                            <p class="product-specs">Intel Core i9, RTX 4080, 32GB RAM, 1TB SSD, Gaming</p>
+                            <p class="product-price">$3,699</p>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="product-img">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/LG_Gram_Style_2023_Laptop-02.jpg/800px-LG_Gram_Style_2023_Laptop-02.jpg" alt="Laptop 9">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">LG Gram Style</h3>
+                            <p class="product-specs">Intel Core i7, 16GB RAM, 1TB SSD, Lightweight</p>
+                            <p class="product-price">$1,599</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex justify-center">
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">Previous</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">1</button>
+                    <button class="px-4 py-2 border border-blue-600 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">2</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">3</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">Next</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="/deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

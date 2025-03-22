@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secondary Color Selection - xperienced.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        /*  Assuming Primary Color is still Tech Blue: #007bff */
+        /*  You will adjust secondary colors based on YOUR primary color choice */
+
+        :root {
+            --primary-color: #007bff;
+            --primary-color-dark:  #0056b3;
+            --primary-color-light: #e6f7ff;
+
+            /*  Secondary Color Variables - Examples to be chosen */
+            --secondary-color-orange: #ff7f50; /* Example Orange - Complementary-ish */
+            --secondary-color-gray: #6c757d;   /* Example Gray - Neutral */
+            --secondary-color-teal: #20c997;   /* Example Teal - Analogous/Variant */
+            --secondary-color-yellow: #ffc107; /* Example Yellow - Accent/Highlight */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            color: #333; /* Default text color */
+        }
+        h1, h2, h3 {
+            font-family: 'Roboto Mono', monospace;
+            color: #222; /* Darker headings */
+        }
+
+        /*  Primary Color Styles (from previous example - keep these) */
+        .brand-primary { color: var(--primary-color); }
+        .brand-background-primary { background-color: var(--primary-color); color: white; }
+        .logo a { color: var(--primary-color); font-family: 'Roboto Mono', monospace; font-size: 24px; font-weight: bold; text-decoration: none; }
+        a { color: var(--primary-color); text-decoration: none; }
+        a:hover { color: var(--primary-color-dark); text-decoration: underline; }
+        .btn-primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-primary:hover { background-color: var(--primary-color-dark); border-color: var(--primary-color-dark); }
+        .btn-primary:focus, .btn-primary:active { outline: none; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); }
+        .btn-secondary { background-color: white; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-secondary:hover { background-color: var(--primary-color-light); color: var(--primary-color-dark); border-color: var(--primary-color-dark); }
+        .nav-bar { background-color: white; border-bottom: 2px solid var(--primary-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-bar nav {}
+        .nav-link { color: #333; padding: 8px 15px; border-radius: 3px; text-decoration: none; margin-left: 10px; transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: var(--primary-color); }
+        input[type="text"], input[type="email"], input[type="search"], textarea, select { border: 1px solid #ccc; padding: 8px; border-radius: 3px; margin-bottom: 10px; display: block; width: 100%; box-sizing: border-box; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 100%; background-position-y: 5px; padding-right: 25px; }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="search"]:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+        .highlight-primary { background-color: var(--primary-color-light); border-left: 5px solid var(--primary-color); padding: 10px; margin: 10px 0; border-radius: 3px; }
+        .badge-primary { background-color: var(--primary-color); color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9em; }
+        .primary-divider { border-bottom: 1px solid var(--primary-color); margin: 20px 0; }
+        .primary-text { color: var(--primary-color); }
+        footer { text-align: center; padding: 20px; color: #777; border-top: 1px solid #eee; margin-top: 30px; }
+
+
+        /*  Secondary Color Styles - Examples  */
+
+        /*  Example 1: Orange Secondary (Complementary-ish) */
+        .accent-orange { color: var(--secondary-color-orange); } /* Text accent */
+        .bg-secondary-orange { background-color: var(--secondary-color-orange); color: white; } /* Background accent */
+        .btn-secondary-orange { background-color: var(--secondary-color-orange); color: white; border-color: var(--secondary-color-orange); padding: 8px 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-secondary-orange:hover { background-color: darken(var(--secondary-color-orange), 10%); border-color: darken(var(--secondary-color-orange), 10%); }
+
+
+        /*  Example 2: Gray Secondary (Neutral) */
+        .accent-gray { color: var(--secondary-color-gray); }
+        .bg-secondary-gray { background-color: var(--secondary-color-gray); color: white; }
+        .btn-secondary-gray { background-color: var(--secondary-color-gray); color: white; border-color: var(--secondary-color-gray); padding: 8px 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-secondary-gray:hover { background-color: darken(var(--secondary-color-gray), 10%); border-color: darken(var(--secondary-color-gray), 10%); }
+
+
+        /*  Example 3: Teal Secondary (Analogous/Variant) */
+        .accent-teal { color: var(--secondary-color-teal); }
+        .bg-secondary-teal { background-color: var(--secondary-color-teal); color: white; }
+        .btn-secondary-teal { background-color: var(--secondary-color-teal); color: white; border-color: var(--secondary-color-teal); padding: 8px 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-secondary-teal:hover { background-color: darken(var(--secondary-color-teal), 10%); border-color: darken(var(--secondary-color-teal), 10%); }
+
+
+        /*  Example 4: Yellow Secondary (Accent/Highlight) */
+        .accent-yellow { color: var(--secondary-color-yellow); }
+        .bg-secondary-yellow { background-color: var(--secondary-color-yellow); color: #333; /* Dark text for contrast on yellow */ }
+        .btn-secondary-yellow { background-color: var(--secondary-color-yellow); color: #333; border-color: var(--secondary-color-yellow); padding: 8px 18px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+        .btn-secondary-yellow:hover { background-color: darken(var(--secondary-color-yellow), 10%); border-color: darken(var(--secondary-color-yellow), 10%); }
+
+
+        /*  Usage Examples for Secondary Colors */
+        .section-header {
+            border-bottom: 3px solid var(--secondary-color-teal); /* Example: Teal secondary for section header underline */
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .testimonial {
+            background-color: var(--secondary-color-light-gray); /* Example: Light gray tint (define in :root if needed) for testimonial background */
+            border-left: 5px solid var(--secondary-color-gray); /* Gray secondary for testimonial border */
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .pricing-highlight {
+            background-color: var(--secondary-color-yellow); /* Example: Yellow secondary to highlight pricing */
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <header class="nav-bar">
+        <div class="logo">
+            <a href="/">xperienced.ai</a>
+        </div>
+        <nav>
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="#" class="nav-link">Services</a>
+            <a href="#" class="nav-link">Contact</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 20px;">
+        <section>
+            <h1>Choosing a Secondary Color for xperienced.ai</h1>
+            <p>A secondary color complements your primary color and is used for accents, highlights, and to create visual interest. It should support your brand's primary color without overpowering it.</p>
+
+            <h2 class="section-header">Example Secondary Color Options (Based on Tech Blue Primary)</h2>
+
+            <p>Here are examples of how different secondary colors could work with a Tech Blue primary color.  We'll demonstrate Orange, Gray, Teal, and Yellow.</p>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px;">
+                <div style="width: 180px; padding: 15px; border: 1px solid #ccc; text-align: center;">
+                    <div class="bg-secondary-orange" style="padding: 20px; margin-bottom: 10px;">Orange Secondary</div>
+                    <button class="btn-secondary-orange">Orange Button</button>
+                    <p class="accent-orange">Orange Accent Text</p>
+                    <p><em>Complementary-ish, vibrant, energetic</em></p>
+                </div>
+
+                <div style="width: 180px; padding: 15px; border: 1px solid #ccc; text-align: center;">
+                    <div class="bg-secondary-gray" style="padding: 20px; margin-bottom: 10px;">Gray Secondary</div>
+                    <button class="btn-secondary-gray">Gray Button</button>
+                    <p class="accent-gray">Gray Accent Text</p>
+                    <p><em>Neutral, sophisticated, balanced</em></p>
+                </div>
+
+                <div style="width: 180px; padding: 15px; border: 1px solid #ccc; text-align: center;">
+                    <div class="bg-secondary-teal" style="padding: 20px; margin-bottom: 10px;">Teal Secondary</div>
+                    <button class="btn-secondary-teal">Teal Button</button>
+                    <p class="accent-teal">Teal Accent Text</p>
+                    <p><em>Analogous, harmonious, modern</em></p>
+                </div>
+
+                 <div style="width: 180px; padding: 15px; border: 1px solid #ccc; text-align: center;">
+                    <div class="bg-secondary-yellow" style="padding: 20px; margin-bottom: 10px; color: black;">Yellow Secondary</div>
+                    <button class="btn-secondary-yellow">Yellow Button</button>
+                    <p class="accent-yellow">Yellow Accent Text</p>
+                    <p><em>Accent/Highlight, cheerful, attention-grabbing</em></p>
+                </div>
+            </div>
+
+
+            <h2 class="section-header">Using Secondary Colors for Accents</h2>
+
+            <h3 class="accent-teal">Section Header Example (Teal Secondary)</h3>
+            <p>Notice how the section header above is underlined with a teal line, using our example teal secondary color. This adds a subtle visual cue.</p>
+
+            <div class="testimonial">
+                <p>"This website is fantastic! I found exactly what I was looking for quickly and easily."</p>
+                <p class="accent-gray">- Happy User, <span class="accent-orange">via OrangeReview</span></p>
+            </div>
+
+            <div class="pricing-highlight">
+                <p>Special Offer: <span style="font-size: 1.2em;">Get 20% Off Today!</span></p>
+            </div>
+
+            <h2 class="section-header">Your Task</h2>
+            <p><b>Choose a secondary color for xperienced.ai.</b> Consider:</p>
+            <ul>
+                <li>How well it complements your chosen primary color.</li>
+                <li>The overall feeling and style you want to create.</li>
+                <li>Where you will use the secondary color (accents, backgrounds, buttons, etc.).</li>
+                <li>Experiment with different secondary colors and see how they look together.  Use online color palette tools for inspiration.</li>
+            </ul>
+
+            <p>Once you've made a decision, let me know your chosen secondary color (e.g., "I choose gray - #6c757d") and we'll move to defining brand typography.</p>
+
+
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 xperienced.ai - Secondary Color Selection</p>
+    </footer>
+
+</body>
+</html>

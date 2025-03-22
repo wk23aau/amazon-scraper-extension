@@ -1,0 +1,78 @@
+<HTML>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hero Section with Search Bar</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --primary: #2563eb;
+                --primary-dark: #1d4ed8;
+                --secondary: #10b981;
+                --dark: #1e293b;
+                --light: #f8fafc;
+                --gray: #64748b;
+                --light-gray: #e2e8f0;
+            }
+    
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                margin: 0;
+                background-color: var(--light-gray); /* Light gray background for hero */
+            }
+    
+            .hero-search-section {
+                padding: 150px 20px;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+    
+            .hero-search-container {
+                max-width: 800px;
+                width: 100%;
+            }
+    
+            .hero-search-bar {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 1.1rem;
+                border: 2px solid var(--light-gray);
+                border-radius: 30px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                transition: box-shadow 0.3s ease; /* Smooth transition for shadow */
+                outline: none; /* Remove default focus outline */
+            }
+    
+            .hero-search-bar::placeholder {
+                color: var(--gray); /* Placeholder text color */
+            }
+    
+            .hero-search-bar:hover,
+            .hero-search-bar:focus {
+                box-shadow: 0 6px 12px rgba(0,0,0,0.1); /* Increased shadow on hover/focus */
+                border-color: var(--gray); /* Keep border color consistent on hover/focus */
+            }
+    
+            @media (max-width: 768px) {
+                .hero-search-section {
+                    padding: 120px 15px;
+                }
+                .hero-search-bar {
+                    font-size: 1rem;
+                    padding: 14px 16px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <section class="hero-search-section">
+            <div class="hero-search-container">
+                <input type="text" class="hero-search-bar" placeholder="Search for your next gadget">
+            </div>
+        </section>
+    </body>
+    </html>

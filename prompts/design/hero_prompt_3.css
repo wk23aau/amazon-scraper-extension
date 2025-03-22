@@ -1,0 +1,33 @@
+
+.hero-minimalist-section {
+    background-color: white;
+    padding: 100px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.hero-minimalist-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.hero-minimalist-logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 100%;
+    height: auto;
+}
+.hero-minimalist-tagline {
+    font-size: 1.5rem;
+    color: #555;
+    font-weight: 300;
+}
+@media (max-width: 768px) {
+    .hero-minimalist-section {
+        padding: 80px 15px;
+    }
+    .hero-minimalist-tagline {
+        font-size: 1.2rem;
+    }
+}
+

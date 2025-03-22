@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .team-member {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .team-member-image {
+            height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .team-member-image img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: cover;
+        }
+
+        .team-member-info {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .team-member-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-size: 1.125rem;
+        }
+
+        .team-member-title {
+            color: var(--gray);
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .team-member-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            color: var(--gray);
+            margin: 0 0.25rem;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .team-member-social a:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <section class="mb-12">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">About xperienced.ai</h1>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                Welcome to xperienced.ai, your trusted guide in the complex world of electronics. We understand that choosing the right laptop, mobile phone, or PC can be overwhelming. That's why we've harnessed the power of artificial intelligence to simplify your decision-making process.
+            </p>
+            <p class="text-gray-700 leading-relaxed mb-6">
+                Our mission is to empower you with clear, unbiased, and data-driven recommendations. We analyze thousands of specifications, benchmark data, and customer reviews to provide you with personalized product comparisons tailored to your needs and preferences. Whether you're a gamer, a creative professional, or simply looking for a reliable device for everyday use, xperienced.ai is here to help you find your perfect match.
+            </p>
+            <p class="text-gray-700 leading-relaxed">
+                At xperienced.ai, we believe in transparency and expertise. Our AI algorithms are constantly refined to ensure accuracy and relevance. We are committed to providing you with the best possible information, so you can shop with confidence and make informed choices.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Our Team</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Team Member 1 -->
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/api/placeholder/300/300" alt="Team Member 1">
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Alex Johnson</h3>
+                        <p class="team-member-title">Founder & CEO</p>
+                        <p class="text-gray-600 mb-4">Visionary leader with a passion for AI and consumer technology.</p>
+                        <div class="team-member-social">
+                            <a href="#" aria-label="LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" aria-label="Twitter Profile"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/api/placeholder/300/300" alt="Team Member 2">
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Sarah Chen</h3>
+                        <p class="team-member-title">Lead Data Scientist</p>
+                        <p class="text-gray-600 mb-4">Expert in machine learning and data analysis, driving our AI innovation.</p>
+                        <div class="team-member-social">
+                            <a href="#" aria-label="LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" aria-label="GitHub Profile"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/api/placeholder/300/300" alt="Team Member 3">
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Michael Davis</h3>
+                        <p class="team-member-title">Head of Engineering</p>
+                        <p class="text-gray-600 mb-4">Leads our development team, ensuring a seamless and robust platform.</p>
+                        <div class="team-member-social">
+                            <a href="#" aria-label="LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" aria-label="Personal Website"><i class="fas fa-globe"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Our Values</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-lightbulb text-secondary mr-2"></i> Innovation</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        We are committed to pushing the boundaries of AI to provide cutting-edge solutions for electronics recommendations.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-check-circle text-secondary mr-2"></i> Accuracy</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        We strive for the highest level of accuracy in our recommendations, ensuring you receive reliable and trustworthy information.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-user-friends text-secondary mr-2"></i> User-Centricity</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Your needs are at the heart of everything we do. We design our platform to be intuitive, helpful, and focused on your best interests.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3"><i class="fas fa-shield-alt text-secondary mr-2"></i> Transparency</h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        We believe in open communication and clear explanations. We aim to make our processes and recommendations understandable to everyone.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Ready to find your perfect electronics?</h2>
+            <p class="text-gray-700 mb-8">Start your search today and let xperienced.ai guide you!</p>
+            <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Get Started Now
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">Laptops</a></li>
+                        <li><a href="#">Mobile Phones</a></li>
+                        <li><a href="#">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="#">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

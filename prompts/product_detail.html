@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Detail - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        .badge-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .badge-accent {
+            background-color: #a78bfa;
+            color: white;
+        }
+        .review-score {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .spec-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: var(--gray);
+        }
+        .review-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .review-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1rem;
+            background-color: var(--light-gray);
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .review-rating {
+            color: #f59e0b;
+        }
+
+        .review-date {
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        .review-content p {
+            color: var(--dark);
+            line-height: 1.5;
+        }
+        .related-product-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+        }
+
+        .related-product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .related-product-image {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .related-product-image img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .related-product-info {
+            padding: 1rem;
+        }
+
+        .related-product-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .related-product-price {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .product-gallery-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        }
+
+        .carousel-item {
+            flex: 0 0 100%; /* Each item takes full width */
+            scroll-snap-align: start;
+            min-width: 100%; /* Ensure full width even if content is smaller */
+            padding: 1rem;
+        }
+
+        .carousel-item img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Product Breadcrumb -->
+        <div class="mb-4 text-sm text-gray-500">
+            <a href="/" class="text-blue-600 hover:underline">Home</a> /
+            <a href="#" class="text-blue-600 hover:underline">Laptops</a> /
+            <span class="font-medium">MacBook Pro 16-inch (2023)</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Product Gallery -->
+            <div>
+                <div class="product-gallery-carousel">
+                    <div class="carousel-item">
+                        <img src="/api/placeholder/600/400" alt="MacBook Pro 16-inch Image 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/api/placeholder/600/400" alt="MacBook Pro 16-inch Image 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="/api/placeholder/600/400" alt="MacBook Pro 16-inch Image 3">
+                    </div>
+                    <!-- Add more images as needed -->
+                </div>
+                <div class="mt-4 flex justify-center space-x-2">
+                    <button class="p-1 border border-gray-300 rounded-md hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <img src="/api/placeholder/80/60" alt="Thumbnail 1" class="w-20 h-15 object-cover rounded-md">
+                    </button>
+                    <button class="p-1 border border-gray-300 rounded-md hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <img src="/api/placeholder/80/60" alt="Thumbnail 2" class="w-20 h-15 object-cover rounded-md">
+                    </button>
+                    <button class="p-1 border border-gray-300 rounded-md hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <img src="/api/placeholder/80/60" alt="Thumbnail 3" class="w-20 h-15 object-cover rounded-md">
+                    </button>
+                    <!-- More thumbnails -->
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">MacBook Pro 16-inch (2023)</h1>
+                <div class="flex items-center mb-4">
+                    <div class="flex text-yellow-400 mr-2">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <span class="text-gray-500 text-sm">(450 Reviews)</span>
+                </div>
+                <div class="mb-4">
+                    <span class="text-gray-700 font-bold text-xl">$2,499</span>
+                    <span class="text-gray-500 line-through ml-2">$2,799</span>
+                    <span class="badge badge-secondary ml-2">20% Off</span>
+                </div>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    The most powerful MacBook Pro ever is here. With the blazing-fast M2 Pro or M2 Max chip, it delivers unprecedented performance and battery life. Featuring a stunning Liquid Retina XDR display and all the ports you need.
+                </p>
+
+                <div class="mb-6">
+                    <h3 class="font-semibold text-gray-900 mb-3">Key Features:</h3>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Apple M2 Pro or M2 Max chip for next-generation performance</li>
+                        <li>Up to 12-core CPU and up to 38-core GPU to tackle complex workflows</li>
+                        <li>Stunning 16.2-inch Liquid Retina XDR display with extreme dynamic range and contrast ratio</li>
+                        <li>Up to 96GB of unified memory for fluid multitasking</li>
+                        <li>Up to 8TB of superfast SSD storage launches apps and opens files in an instant</li>
+                        <li>1080p FaceTime HD camera, studio-quality mics, and six-speaker sound system</li>
+                        <li>Three Thunderbolt 4 ports, HDMI port, SDXC card slot, headphone jack, MagSafe 3 charging port</li>
+                    </ul>
+                </div>
+
+                <div class="flex items-center space-x-4 mb-6">
+                    <button class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                    </button>
+                    <button class="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        <i class="far fa-heart mr-2"></i> Add to Wishlist
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <div class="review-score mb-3">4.8</div>
+                    <p class="text-gray-700 text-sm">Average Customer Rating</p>
+                    <a href="#reviews-section" class="text-blue-600 text-sm hover:underline">Read all reviews</a>
+                </div>
+
+                <div>
+                    <span class="badge badge-primary">Best Seller</span>
+                    <span class="badge badge-accent">Editor's Choice</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications Section -->
+        <section class="my-12">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Specifications</h2>
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <div class="spec-item">
+                    <div class="spec-label">Processor</div>
+                    <div class="text-gray-700">Apple M2 Pro 10-core CPU</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Graphics</div>
+                    <div class="text-gray-700">Integrated 16-core GPU</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Memory</div>
+                    <div class="text-gray-700">16GB unified memory</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Storage</div>
+                    <div class="text-gray-700">512GB SSD storage</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Display</div>
+                    <div class="text-gray-700">16.2-inch Liquid Retina XDR display</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Operating System</div>
+                    <div class="text-gray-700">macOS</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Battery Life</div>
+                    <div class="text-gray-700">Up to 22 hours movie playback</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Weight</div>
+                    <div class="text-gray-700">4.7 pounds (2.1 kg)</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Ports</div>
+                    <div class="text-gray-700">3x Thunderbolt 4, 1x HDMI, 1x SDXC, 1x Headphone Jack, 1x MagSafe 3</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section id="reviews-section" class="my-12">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Customer Reviews</h2>
+
+            <div class="mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="review-score mr-4">4.8</div>
+                        <div>
+                            <p class="text-gray-900 font-bold">Excellent</p>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-500 text-sm">Based on 450 reviews</span>
+                        </div>
+                    </div>
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Write a Review
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Review Card 1 -->
+                <div class="review-card">
+                    <div class="review-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">John Doe</div>
+                            <div class="flex items-center">
+                                <div class="review-rating flex text-yellow-400 mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="review-date text-gray-500">3 days ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>This laptop is incredibly fast and the display is gorgeous. Battery life is as advertised, easily lasting a full day of work. Highly recommend!</p>
+                    </div>
+                </div>
+
+                <!-- Review Card 2 -->
+                <div class="review-card">
+                    <div class="review-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Jane Smith</div>
+                            <div class="flex items-center">
+                                <div class="review-rating flex text-yellow-400 mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="review-date text-gray-500">1 week ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>Excellent performance for video editing and graphic design. The screen is color accurate and the machine runs very quietly. A bit pricey, but worth it for professionals.</p>
+                    </div>
+                </div>
+
+                <!-- Review Card 3 -->
+                <div class="review-card">
+                    <div class="review-author">
+                        <div class="author-avatar"></div>
+                        <div>
+                            <div class="author-name">Peter Jones</div>
+                            <div class="flex items-center">
+                                <div class="review-rating flex text-yellow-400 mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <span class="review-date text-gray-500">2 weeks ago</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        <p>Great laptop overall. The keyboard is comfortable to type on and the trackpad is very responsive. The only downside is the limited port selection, but dongles solve that issue.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Load More Reviews
+                </button>
+            </div>
+        </section>
+
+        <!-- Related Products Section -->
+        <section class="my-12">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Related Products</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Related Product Card 1 -->
+                <div class="related-product-card">
+                    <div class="related-product-image">
+                        <img src="/api/placeholder/200/150" alt="Related Product 1">
+                    </div>
+                    <div class="related-product-info">
+                        <h3 class="related-product-name">MacBook Air 13-inch</h3>
+                        <p class="related-product-price">$1,299</p>
+                    </div>
+                </div>
+
+                <!-- Related Product Card 2 -->
+                <div class="related-product-card">
+                    <div class="related-product-image">
+                        <img src="/api/placeholder/200/150" alt="Related Product 2">
+                    </div>
+                    <div class="related-product-info">
+                        <h3 class="related-product-name">MacBook Pro 14-inch</h3>
+                        <p class="related-product-price">$1,999</p>
+                    </div>
+                </div>
+
+                <!-- Related Product Card 3 -->
+                <div class="related-product-card">
+                    <div class="related-product-image">
+                        <img src="/api/placeholder/200/150" alt="Related Product 3">
+                    </div>
+                    <div class="related-product-info">
+                        <h3 class="related-product-name">Dell XPS 15</h3>
+                        <p class="related-product-price">$1,799</p>
+                    </div>
+                </div>
+
+                <!-- Related Product Card 4 -->
+                <div class="related-product-card">
+                    <div class="related-product-image">
+                        <img src="/api/placeholder/200/150" alt="Related Product 4">
+                    </div>
+                    <div class="related-product-info">
+                        <h3 class="related-product-name">HP Spectre x360 16</h3>
+                        <p class="related-product-price">$1,649</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">Laptops</a></li>
+                        <li><a href="#">Mobile Phones</a></li>
+                        <li><a href="#">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="#">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carousel = document.querySelector('.product-gallery-carousel');
+            let isDragging = false;
+            let startX;
+            let scrollLeft;
+
+            carousel.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - carousel.offsetLeft;
+                scrollLeft = carousel.scrollLeft;
+                carousel.classList.add('dragging'); // Add a class for visual feedback during drag
+            });
+
+            carousel.addEventListener('mouseleave', () => {
+                isDragging = false;
+                carousel.classList.remove('dragging');
+            });
+
+            carousel.addEventListener('mouseup', () => {
+                isDragging = false;
+                carousel.classList.remove('dragging');
+            });
+
+            carousel.addEventListener('mousemove', (e) => {
+                if(!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - carousel.offsetLeft;
+                const walk = (x - startX) * 1; //scroll-fast speed
+                carousel.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
+
+</body>
+</html>

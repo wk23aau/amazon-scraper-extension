@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found - xperienced.ai</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --error-red: #ef4444;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .error-container {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+        }
+
+        .error-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .error-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--error-red);
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            font-size: 1.1rem;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .button-primary {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .button-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .button-secondary {
+            display: inline-block;
+            padding: 12px 24px;
+            color: var(--primary);
+            background-color: transparent;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            border: 2px solid var(--primary);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            margin-left: 10px;
+        }
+
+        .button-secondary:hover {
+            background-color: var(--light-gray);
+            border-color: var(--primary-dark);
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 600px) {
+            .error-container {
+                padding: 30px;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .error-message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <img src="https://creazilla-store.fra1.digitaloceanspaces.com/emojis/43955/page-not-found-emoji-clipart-xl.png" alt="Page Not Found" class="error-image" style="max-width: 200px; display: block; margin-left: auto; margin-right: auto;">
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">
+            We're sorry, but the page you are looking for could not be found.
+            Please check the URL or use the navigation to find what you need.
+        </p>
+        <a href="/" class="button-primary">Go to Homepage</a>
+        <a href="/contact" class="button-secondary">Contact Support</a>
+    </div>
+</body>
+</html>

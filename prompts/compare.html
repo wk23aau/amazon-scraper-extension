@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Comparison - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--light-gray);
+            text-align: left;
+        }
+
+        .comparison-table th {
+            font-weight: bold;
+            background-color: #f9fafb;
+        }
+
+        .comparison-table tbody tr:nth-child(odd) {
+            background-color: #fefefe;
+        }
+
+        .comparison-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .comparison-table img {
+            max-width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .metric-highlight {
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="https://www.svgrepo.com/show/512448/artificial-intelligence-2.svg" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/laptops" class="text-gray-700 hover:text-blue-600 font-medium">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="/deals" class="text-gray-700 hover:text-blue-600">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Compare Laptops</h1>
+
+        <div class="overflow-x-auto">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/MacBook_Pro_14_and_16_2021.jpg/800px-MacBook_Pro_14_and_16_2021.jpg" alt="MacBook Pro 14">
+                            <h3 class="font-semibold text-gray-800 mt-2">MacBook Pro 14"</h3>
+                        </th>
+                        <th>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Dell_XPS_15_9520_%282022%29.jpg/800px-Dell_XPS_15_9520_%282022%29.jpg" alt="Dell XPS 15">
+                            <h3 class="font-semibold text-gray-800 mt-2">Dell XPS 15</h3>
+                        </th>
+                        <th>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/HP_Spectre_X360_14_%282023%29.png/800px-HP_Spectre_X360_14_%282023%29.png" alt="HP Spectre x360 14">
+                            <h3 class="font-semibold text-gray-800 mt-2">HP Spectre x360 14</h3>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Price</th>
+                        <td class="font-bold text-blue-600">$1,999</td>
+                        <td class="font-bold text-blue-600">$2,199</td>
+                        <td class="font-bold text-blue-600">$1,699</td>
+                    </tr>
+                    <tr>
+                        <th>Processor</th>
+                        <td>Apple M3 Pro</td>
+                        <td>Intel Core i9-13900H</td>
+                        <td>Intel Core i7-13700P</td>
+                    </tr>
+                    <tr>
+                        <th>Graphics</th>
+                        <td>Integrated 16-core GPU</td>
+                        <td>NVIDIA GeForce RTX 4070</td>
+                        <td>Intel Iris Xe Graphics</td>
+                    </tr>
+                    <tr>
+                        <th>RAM</th>
+                        <td class="metric-highlight">16GB Unified Memory</td>
+                        <td>32GB DDR5</td>
+                        <td>16GB DDR4</td>
+                    </tr>
+                    <tr>
+                        <th>Storage</th>
+                        <td>1TB SSD</td>
+                        <td class="metric-highlight">1TB SSD</td>
+                        <td>512GB SSD</td>
+                    </tr>
+                    <tr>
+                        <th>Display</th>
+                        <td>14.2-inch Liquid Retina XDR</td>
+                        <td>15.6-inch OLED</td>
+                        <td>13.5-inch OLED Touchscreen</td>
+                    </tr>
+                    <tr>
+                        <th>Battery Life</th>
+                        <td class="metric-highlight">Up to 18 hours</td>
+                        <td>Up to 8 hours</td>
+                        <td>Up to 12 hours</td>
+                    </tr>
+                    <tr>
+                        <th>Weight</th>
+                        <td>3.5 lbs</td>
+                        <td>4.2 lbs</td>
+                        <td class="metric-highlight">3.0 lbs</td>
+                    </tr>
+                    <tr>
+                        <th>Rating</th>
+                        <td class="text-yellow-500">★★★★★</td>
+                        <td class="text-yellow-500">★★★★☆</td>
+                        <td class="text-yellow-500">★★★★★</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                        </td>
+                        <td>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                        </td>
+                        <td>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/laptops">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="/deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

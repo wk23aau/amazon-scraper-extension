@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page Headline - xperienced.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Styles - Adjust based on your brand decisions */
+        :root {
+            --primary-color: #007bff;
+            --heading-font-family: 'Oswald', sans-serif;
+            --body-font-family: 'Nunito', sans-serif;
+        }
+        body {
+            font-family: var(--body-font-family);
+            margin: 0; /* Reset default body margin */
+            color: #333;
+            background-color: #f8f9fa; /* Light background */
+        }
+
+        .landing-header {
+            background-color: #fff; /* White header background */
+            padding: 20px;
+            text-align: center; /* Center align header content */
+        }
+
+        .logo a {
+            color: var(--primary-color);
+            font-family: var(--heading-font-family);
+            font-size: 28px; /* Slightly larger logo */
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block; /* To allow margin below to work */
+            margin-bottom: 20px; /* Space below logo */
+        }
+
+        .landing-headline {
+            font-family: var(--heading-font-family);
+            font-size: 2.8em; /* Large headline size */
+            font-weight: 700;
+            line-height: 1.2;
+            color: #222; /* Darker headline text */
+            margin-bottom: 15px; /* Space below headline */
+        }
+
+        .landing-subheadline {
+            font-size: 1.2em;
+            color: #555; /* Slightly lighter subheadline text */
+            line-height: 1.5;
+            margin-bottom: 30px; /* More space below subheadline before other content */
+        }
+
+        /*  Basic container for page content below header - for layout purposes */
+        .landing-content {
+            max-width: 960px;
+            margin: 0 auto; /* Center content on page */
+            padding: 20px;
+        }
+
+        /* Example Button Style (you'll refine this later) */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            display: inline-block; /* For button layout */
+            text-decoration: none; /* If using <a> tag as button */
+        }
+
+        .btn-primary:hover {
+            background-color: darken(var(--primary-color), 10%); /* Darken on hover - you might need a CSS preprocessor or adjust manually */
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <header class="landing-header">
+        <div class="logo">
+            <a href="/">xperienced.ai</a>
+        </div>
+        <h1 class="landing-headline">Find the Perfect Tech, Powered by AI</h1>
+        <!-- Alternative Headlines (for A/B testing ideas):
+             <h1 class="landing-headline">Smarter Tech Recommendations. Effortlessly.</h1>
+             <h1 class="landing-headline">Your AI Guide to the Best Electronics</h1>
+        -->
+        <p class="landing-subheadline">Get intelligent, data-driven recommendations for laptops, mobiles, PCs, and more.  Stop guessing, start experiencing.</p>
+        <!-- Example Subheadline - you'll refine this in the next prompt -->
+        <a href="#" class="btn-primary">Explore Devices</a> <!-- Example Call-to-Action Button -->
+    </header>
+
+    <main class="landing-content">
+        <section>
+            <h2>Why xperienced.ai?</h2>
+            <p>Explain your website's value proposition here.  Focus on the benefits for the user.  For example:</p>
+            <ul>
+                <li>Save time and effort researching electronics.</li>
+                <li>Get unbiased, data-backed recommendations.</li>
+                <li>Discover devices that truly match your needs and preferences.</li>
+                <li>Make confident purchasing decisions.</li>
+            </ul>
+        </section>
+
+        <section style="margin-top: 40px;">
+            <h2>Featured Categories</h2>
+            <p>Showcase some key product categories here (Laptops, Mobiles, PCs, etc.) with icons or images.  This is just placeholder content.</p>
+            <!--  Category icons/links would go here -->
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 xperienced.ai</p>
+    </footer>
+
+</body>
+</html>

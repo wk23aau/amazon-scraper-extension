@@ -1,0 +1,37 @@
+
+.hero-minimalist-section {
+    background-color: white;
+    padding: 100px 20px; /* Adjust padding as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-minimalist-container {
+    max-width: 800px; /* Adjust max-width as needed */
+    margin: 0 auto;
+}
+
+.hero-minimalist-logo {
+    display: block; /* Ensure image behaves as block to center properly */
+    margin: 0 auto 20px; /* Center horizontally and add bottom margin */
+    max-width: 100%; /* Make logo responsive */
+    height: auto;
+}
+
+.hero-minimalist-tagline {
+    font-size: 1.5rem; /* Adjust font size as needed */
+    color: #555; /* Choose a subtle color */
+    font-weight: 300; /* Lighter font weight for minimalist style */
+}
+
+@media (max-width: 768px) {
+    .hero-minimalist-section {
+        padding: 80px 15px; /* Adjust padding for smaller screens */
+    }
+    .hero-minimalist-tagline {
+        font-size: 1.2rem; /* Adjust tagline font size for smaller screens */
+    }
+}
+

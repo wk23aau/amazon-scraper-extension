@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - MacBook Pro 14" - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+        .product-image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .product-image-gallery img {
+            cursor: pointer;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            height: 60px;
+            width: 100%;
+            transition: border-color 0.3s;
+        }
+
+        .product-image-gallery img:hover,
+        .product-image-gallery img.active {
+            border: 2px solid var(--primary);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="https://www.svgrepo.com/show/512448/artificial-intelligence-2.svg" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/laptops" class="text-gray-700 hover:text-blue-600 font-medium">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="/deals" class="text-gray-700 hover:text-blue-600">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Product Image Gallery -->
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/MacBook_Pro_14_and_16_2021.jpg/800px-MacBook_Pro_14_and_16_2021.jpg" alt="MacBook Pro 14-inch" class="w-full rounded-lg shadow-md mb-4" id="main-product-image">
+                <div class="product-image-gallery">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/MacBook_Pro_14_and_16_2021.jpg/800px-MacBook_Pro_14_and_16_2021.jpg" alt="Thumbnail 1" onclick="changeMainImage(this)" class="active">
+                    <img src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=900&hei=840&fmt=jpeg&qlt=90&.v=1671304692674" alt="Thumbnail 2" onclick="changeMainImage(this)">
+                    <img src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp14-spacegray-gallery1-202301?wid=900&hei=840&fmt=jpeg&qlt=90&.v=1671224767847" alt="Thumbnail 3" onclick="changeMainImage(this)">
+                    <img src="https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/mbp14-spacegray-gallery3-202301?wid=900&hei=840&fmt=jpeg&qlt=90&.v=1671224767719" alt="Thumbnail 4" onclick="changeMainImage(this)">
+                </div>
+            </div>
+
+            <!-- Product Details -->
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-3">MacBook Pro 14-inch</h1>
+                <div class="flex items-center mb-4">
+                    <span class="text-yellow-500 mr-2">★★★★★</span>
+                    <span class="text-gray-500">(128 Reviews)</span>
+                </div>
+
+                <div class="mb-6">
+                    <span class="inline-block text-xl font-bold text-blue-600">$1,999</span>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-gray-700 leading-relaxed">
+                        The MacBook Pro 14-inch is a powerhouse laptop, featuring the blazing-fast Apple M3 Pro chip, a stunning Liquid Retina XDR display, and all-day battery life. Perfect for professionals and creatives who demand top-tier performance and portability.
+                    </p>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Key Features</h3>
+                    <ul class="list-disc list-inside text-gray-700">
+                        <li>Apple M3 Pro chip for next-level performance</li>
+                        <li>Stunning 14-inch Liquid Retina XDR display</li>
+                        <li>Up to 18 hours of battery life</li>
+                        <li>16GB unified memory</li>
+                        <li>1TB SSD storage</li>
+                        <li>Three Thunderbolt 4 ports, HDMI port, SDXC card slot, headphone jack, MagSafe 3 port</li>
+                        <li>Backlit Magic Keyboard with Touch ID</li>
+                    </ul>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">Specifications</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border-collapse border border-gray-200">
+                            <tbody class="text-sm">
+                                <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Processor</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">Apple M3 Pro Chip</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Memory</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">16GB Unified Memory</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Storage</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">1TB SSD</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Display</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">14.2-inch Liquid Retina XDR display</td>
+                                </tr>
+                                 <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Graphics</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">Integrated 16-core GPU</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-200 px-4 py-2 font-medium text-gray-700">Operating System</td>
+                                    <td class="border border-gray-200 px-4 py-2 text-gray-600">macOS</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 mb-8">
+                    <button class="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-shopping-cart mr-2"></i> Add to Cart
+                    </button>
+                    <button class="px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <i class="far fa-heart mr-2"></i> Add to Wishlist
+                    </button>
+                    <button class="px-6 py-3 bg-secondary text-white rounded-md hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-secondary-500">
+                        <i class="fas fa-compress-arrows-alt mr-2"></i> Compare
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/laptops">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="/deals">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/faq">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function changeMainImage(element) {
+            const mainImage = document.getElementById('main-product-image');
+            mainImage.src = element.src;
+
+            // Remove active class from all thumbnails
+            document.querySelectorAll('.product-image-gallery img').forEach(img => {
+                img.classList.remove('active');
+            });
+
+            // Add active class to the clicked thumbnail
+            element.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

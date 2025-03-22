@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Comparison - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+        }
+
+        .metric-highlight {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+        .comparison-table th {
+            position: sticky;
+            top: 0;
+            background-color: #f9fafb;
+            z-index: 10;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .comparison-table thead tr th:first-child {
+            background-color: white;
+        }
+
+        .comparison-table td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: white;
+            z-index: 5;
+        }
+        .comparison-table tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+
+        @media (max-width: 768px) {
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+        .progress-value {
+            height: 100%;
+            border-radius: 4px;
+            background-color: #3b82f6;
+        }
+        .explanation-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .explanation-item:last-child {
+            border-bottom: none;
+        }
+
+        .explanation-icon {
+            margin-right: 1rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+            width: 2rem;
+            text-align: center;
+        }
+
+        .explanation-content h3 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .review-excerpt {
+            padding: 1rem;
+            border-left: 3px solid var(--secondary);
+            margin-bottom: 1rem;
+            background-color: #f0fdf4;
+            border-radius: 0.25rem;
+        }
+
+        .review-excerpt p.quote {
+            font-style: italic;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .review-excerpt cite {
+            display: block;
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        .refine-search-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+        }
+
+        .refine-search-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .refine-search-card h3 {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark);
+        }
+
+        .refine-search-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        .refine-search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Gaming Laptop Comparison</h1>
+            <p class="text-gray-600">Based on your search for <span class="font-medium">"gaming laptop with good battery"</span></p>
+        </div>
+
+        <!-- Product Comparison Table -->
+        <div class="bg-white shadow-md rounded-lg overflow-hidden mb-8">
+            <div class="overflow-x-auto">
+                <table class="comparison-table w-full">
+                    <thead class="">
+                        <tr class="border-b">
+                            <th class="px-6 py-4 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Specifications</th>
+                            <th class="px-6 py-4 text-center">
+                                <div class="flex flex-col items-center">
+                                    <img src="/api/placeholder/180/120" alt="ASUS ROG Zephyrus G14" class="w-24 h-16 object-contain mb-2 rounded-md border border-gray-200">
+                                    <span class="font-medium text-gray-900 mt-2 text-lg">ASUS ROG Zephyrus G14</span>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                        <span class="text-xs text-gray-500 ml-1">(542)</span>
+                                    </div>
+                                    <span class="font-bold text-gray-900 mt-1">$1,499</span>
+                                    <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-center">
+                                <div class="flex flex-col items-center">
+                                    <img src="/api/placeholder/180/120" alt="Razer Blade 15" class="w-24 h-16 object-contain mb-2 rounded-md border border-gray-200">
+                                    <span class="font-medium text-gray-900 mt-2 text-lg">Razer Blade 15</span>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-gray-500 ml-1">(387)</span>
+                                    </div>
+                                    <span class="font-bold text-gray-900 mt-1">$1,799</span>
+                                    <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-center">
+                                <div class="flex flex-col items-center">
+                                    <img src="/api/placeholder/180/120" alt="MSI GS66 Stealth" class="w-24 h-16 object-contain mb-2 rounded-md border border-gray-200">
+                                    <span class="font-medium text-gray-900 mt-2 text-lg">MSI GS66 Stealth</span>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </div>
+                                        <span class="text-xs text-gray-500 ml-1">(629)</span>
+                                    </div>
+                                    <span class="font-bold text-gray-900 mt-1">$1,699</span>
+                                    <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-center">
+                                <div class="flex flex-col items-center">
+                                    <img src="/api/placeholder/180/120" alt="Lenovo Legion 5 Pro" class="w-24 h-16 object-contain mb-2 rounded-md border border-gray-200">
+                                    <span class="font-medium text-gray-900 mt-2 text-lg">Lenovo Legion 5 Pro</span>
+                                    <div class="flex items-center mt-1">
+                                        <div class="flex text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <span class="text-xs text-gray-500 ml-1">(412)</span>
+                                    </div>
+                                    <span class="font-bold text-gray-900 mt-1">$1,399</span>
+                                    <button class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Deal</button>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <!-- Performance Metrics -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-3 bg-gray-50">
+                                <h3 class="text-sm font-medium text-gray-900">Performance</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Processor</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">AMD Ryzen 9 7940HS</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">Intel Core i9-13900H</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Intel Core i7-13700H</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">AMD Ryzen 7 7840HS</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Graphics Card</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">NVIDIA RTX 4070</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">NVIDIA RTX 4080</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">NVIDIA RTX 4070</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">NVIDIA RTX 4070</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">RAM</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">16GB DDR5</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">32GB DDR5</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">32GB DDR5</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">32GB DDR5 (4800MHz)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Storage</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1TB SSD</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1TB SSD</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">2TB SSD</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1TB SSD</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Gaming Performance</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 87%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">87</span>
+                            </td>
+                            <td class="px-6 py-4 text-center metric-highlight">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 96%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">96</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 89%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">89</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 84%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">84</span>
+                            </td>
+                        </tr>
+
+                        <!-- Display Metrics -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-3 bg-gray-50">
+                                <h3 class="text-sm font-medium text-gray-900">Display</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Screen Size</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">14" (Compact)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">15.6"</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">15.6"</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">16" (16:10)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Resolution</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">2560 x 1600</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1920 x 1080</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">1920 x 1080</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">2560 x 1600</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Refresh Rate</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">165Hz</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">360Hz</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">240Hz</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">165Hz</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Display Technology</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">IPS, 100% DCI-P3</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">IPS, 100% sRGB</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">IPS, 100% sRGB</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">IPS, 100% sRGB</td>
+                        </tr>
+
+                        <!-- Battery -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-3 bg-gray-50">
+                                <h3 class="text-sm font-medium text-gray-900">Battery</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Battery Capacity</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">76Wh</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">80Wh</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">99.9Wh</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">80Wh</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Battery Life (Mixed Usage)</td>
+                            <td class="px-6 py-4 text-center metric-highlight">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 95%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">10.5 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 65%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">6 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 70%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">7 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 80%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">8 hrs</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Gaming on Battery</td>
+                            <td class="px-6 py-4 text-center metric-highlight">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 75%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">2.5 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 40%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">1.5 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 50%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">1.8 hrs</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 60%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">2 hrs</span>
+                            </td>
+                        </tr>
+
+                        <!-- Benchmarks -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-3 bg-gray-50">
+                                <h3 class="text-sm font-medium text-gray-900">Benchmarks</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Geekbench 6 (Multi-core)</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 88%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">11,248</span>
+                            </td>
+                            <td class="px-6 py-4 text-center metric-highlight">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 98%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">14,567</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 92%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">12,890</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 85%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">10,654</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">3DMark Time Spy</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 82%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">9,876</span>
+                            </td>
+                            <td class="px-6 py-4 text-center metric-highlight">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 95%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">12,543</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 85%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">10,234</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="w-full progress-bar">
+                                    <div class="progress-value" style="width: 78%;"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 mt-1 inline-block">9,451</span>
+                            </td>
+                        </tr>
+
+                        <!-- Physical Attributes -->
+                        <tr>
+                            <td colspan="5" class="px-6 py-3 bg-gray-50">
+                                <h3 class="text-sm font-medium text-gray-900">Physical Attributes</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Weight</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">3.6 lbs (1.65 kg)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">4.4 lbs (2.0 kg)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">4.6 lbs (2.1 kg)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">5.3 lbs (2.4 kg)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dimensions</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center metric-highlight">12.3" x 8.9" x 0.7"</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">13.9" x 9.2" x 0.7"</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">14.1" x 9.8" x 0.8"</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">14.3" x 10.2" x 1.1"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recommendation Explanations -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Why These Products Match Your Search</h2>
+                <div class="space-y-4">
+                    <div class="explanation-item">
+                        <div class="explanation-icon"><i class="fas fa-battery-half"></i></div>
+                        <div class="explanation-content">
+                            <h3 class="font-medium text-gray-900">ASUS ROG Zephyrus G14</h3>
+                            <p class="mt-1 text-sm text-gray-600">Best battery life among gaming laptops with 10.5 hours of mixed usage. Lightweight design (3.6 lbs) makes it perfect for gaming on the go. The AMD processor is power-efficient while still delivering strong gaming performance.</p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <div class="explanation-icon"><i class="fas fa-rocket"></i></div>
+                        <div class="explanation-content">
+                            <h3 class="font-medium text-gray-900">Razer Blade 15</h3>
+                            <p class="mt-1 text-sm text-gray-600">Highest performance with RTX 4080 GPU and Intel i9 processor. Premium build quality with sleek aluminum chassis. Balanced option between performance and portability, though battery life is lower than competitors.</p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <div class="explanation-icon"><i class="fas fa-hdd"></i></div>
+                        <div class="explanation-content">
+                            <h3 class="font-medium text-gray-900">MSI GS66 Stealth</h3>
+                            <p class="mt-1 text-sm text-gray-600">Best storage capacity (2TB SSD) and largest battery capacity (99.9Wh). High refresh rate display (240Hz) ideal for competitive gaming. Good balance of performance and battery life with 7 hours</p>
+                        </div>
+                    </div>
+                    <div class="explanation-item">
+                        <div class="explanation-icon"><i class="fas fa-desktop"></i></div>
+                        <div class="explanation-content">
+                            <h3 class="font-medium text-gray-900">Lenovo Legion 5 Pro</h3>
+                            <p class="mt-1 text-sm text-gray-600">Larger 16" display with 16:10 aspect ratio for immersive gaming. Strong performance and good battery life balance. More affordable option compared to Razer Blade 15 while offering similar gaming experience.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">What Experts are Saying</h2>
+                <div class="space-y-4">
+                    <div class="review-excerpt">
+                        <p class="quote">"The Zephyrus G14 is an outstanding gaming laptop that delivers incredible performance in a remarkably portable chassis, and it does so without compromising battery life."</p>
+                        <cite>- TechRadar</cite>
+                        <a href="#" class="text-blue-600 text-sm hover:underline">Read Full Review</a>
+                    </div>
+                    <div class="review-excerpt">
+                        <p class="quote">"The Razer Blade 15 remains one of the best premium gaming laptops you can buy, offering top-tier performance and a stunning display, though battery life is average."</p>
+                        <cite>- The Verge</cite>
+                        <a href="#" class="text-blue-600 text-sm hover:underline">Read Full Review</a>
+                    </div>
+                    <div class="review-excerpt">
+                        <p class="quote">"MSI's GS66 Stealth packs serious power into a slim design with a fantastic screen and comfortable keyboard, making it a great all-rounder, though it can get a bit hot under load."</p>
+                        <cite>- PC Gamer</cite>
+                        <a href="#" class="text-blue-600 text-sm hover:underline">Read Full Review</a>
+                    </div>
+                    <div class="review-excerpt">
+                        <p class="quote">"The Lenovo Legion 5 Pro offers excellent gaming performance for the price, with a vibrant display and solid build quality, making it a top choice for budget-conscious gamers."</p>
+                        <cite>- Laptop Mag</cite>
+                        <a href="#" class="text-blue-600 text-sm hover:underline">Read Full Review</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Refine Your Search Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Refine Your Search</h2>
+            <div class="refine-search-grid">
+                <div class="refine-search-card">
+                    <h3>Gaming laptops under $1500</h3>
+                    <p>Explore high-performance gaming laptops that fit a tighter budget.</p>
+                </div>
+                <div class="refine-search-card">
+                    <h3>Gaming laptops with 16GB+ RAM</h3>
+                    <p>Ensure smooth multitasking and future-proof your gaming setup.</p>
+                </div>
+                <div class="refine-search-card">
+                    <h3>Lightweight gaming laptops</h3>
+                    <p>Prioritize portability without sacrificing too much gaming power.</p>
+                </div>
+                <div class="refine-search-card">
+                    <h3>Gaming laptops with best cooling</h3>
+                    <p>Find laptops that stay cool even during intense gaming sessions.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-8">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                        <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">Explore</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li><a href="#">Laptops</a></li>
+                            <li><a href="#">Mobile Phones</a></li>
+                            <li><a href="#">Desktop PCs</a></li>
+                            <li><a href="#">Product Comparison</a></li>
+                            <li><a href="#">Deals</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">Support</h3>
+                        <ul class="text-gray-300 space-y-2">
+                            <li><a href="#">FAQs</a></li>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-4">Connect</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                            <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                    <p>© 2025 xperienced.ai. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Define Brand Typography: Heading Font - xperienced.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Nunito:wght@400;700&family=Oswald:wght@400;700&family=Poppins:wght@400;700&family=мерривезер:wght@400;700&display=swap" rel="stylesheet"> <!-- Example Font Choices - Google Fonts -->
+    <style>
+        /*  Assuming Primary and Secondary Colors are defined (from previous steps) */
+        :root {
+            --primary-color: #007bff; /* Example Tech Blue */
+            --secondary-color: #6c757d; /* Example Gray */
+            --heading-font-family: 'Roboto Mono', monospace; /* Default - Example Heading Font (Techy) */
+            --body-font-family: 'Nunito', sans-serif; /* Example Body Font (Friendly) */
+        }
+
+        body {
+            font-family: var(--body-font-family); /* Apply body font to the whole body */
+            margin: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--heading-font-family); /* Apply heading font to all headings */
+            color: #222; /* Darker heading color */
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+        }
+
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.75em; }
+        h4 { font-size: 1.5em; }
+        h5 { font-size: 1.25em; }
+        h6 { font-size: 1em; }
+
+
+        /*  Example Heading Font Styles - To preview different options */
+
+        .heading-font-roboto-mono { font-family: 'Roboto Mono', monospace; } /* Techy, Monospace */
+        .heading-font-oswald { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: -0.02em; } /* Modern, Bold Sans-Serif */
+        .heading-font-poppins { font-family: 'Poppins', sans-serif; font-weight: 700; } /* Clean, Geometric Sans-Serif */
+        .heading-font-merriweather { font-family: 'Merriweather', serif; } /* Serif, Readable, Classic */
+
+
+        /*  Keep basic styles from previous steps for context */
+        .nav-bar { background-color: white; border-bottom: 2px solid var(--primary-color); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo a { color: var(--primary-color); font-family: var(--heading-font-family); font-size: 24px; font-weight: bold; text-decoration: none; }
+        .nav-link { color: #333; padding: 8px 15px; border-radius: 3px; text-decoration: none; margin-left: 10px; transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: var(--primary-color); }
+        .btn-primary { background-color: var(--primary-color); color: white; border-color: var(--primary-color); padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
+
+
+    </style>
+</head>
+<body>
+
+    <header class="nav-bar">
+        <div class="logo">
+            <a href="/">xperienced.ai</a>
+        </div>
+        <nav>
+            <a href="#" class="nav-link active">Home</a>
+            <a href="#" class="nav-link">About</a>
+            <a href="#" class="nav-link">Services</a>
+            <a href="#" class="nav-link">Contact</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 20px;">
+        <section>
+            <h1>Choosing Your Heading Font for xperienced.ai</h1>
+            <p>The heading font is crucial for establishing visual hierarchy and brand personality. It should be distinct from your body font and reflect the overall style of xperienced.ai (minimalist, tech-focused, friendly, etc.).</p>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2>Example Heading Font: Roboto Mono (Monospace - Techy)</h2>
+                <h3 class="heading-font-roboto-mono">This is an H3 Heading</h3>
+                <h4 class="heading-font-roboto-mono">This is an H4 Heading</h4>
+                <p>This font is a monospace font, often associated with technology, code, and a modern, slightly technical feel. It can be a good choice if you want a tech-focused or minimalist style.</p>
+                <p>To use this, we set <code>--heading-font-family: 'Roboto Mono', monospace;</code> in our CSS <code>:root</code> and apply <code>font-family: var(--heading-font-family);</code> to <code>h1, h2, h3...</code> elements.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="heading-font-oswald">Example Heading Font: Oswald (Bold Sans-Serif - Modern)</h2>
+                <h3 class="heading-font-oswald">This is an H3 Heading</h3>
+                <h4 class="heading-font-oswald">This is an H4 Heading</h4>
+                <p>Oswald is a strong, bold sans-serif font. It's modern, impactful, and works well for headlines that need to grab attention. Good for a tech-focused or bold minimalist style.</p>
+                <p>To use this, we would change <code>--heading-font-family: 'Oswald', sans-serif;</code> and potentially adjust <code>font-weight</code> and <code>letter-spacing</code> in CSS.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="heading-font-poppins">Example Heading Font: Poppins (Geometric Sans-Serif - Clean)</h2>
+                <h3 class="heading-font-poppins">This is an H3 Heading</h3>
+                <h4 class="heading-font-poppins">This is an H4 Heading</h4>
+                <p>Poppins is a clean, geometric sans-serif font. It's versatile, modern, and very readable.  A good choice for almost any style, including minimalist, tech-focused, or even a friendly but professional style.</p>
+                <p>To use this, set <code>--heading-font-family: 'Poppins', sans-serif;</code> in your CSS.</p>
+            </section>
+
+            <section style="margin-top: 30px; border: 1px solid #eee; padding: 20px; border-radius: 5px;">
+                <h2 class="heading-font-merriweather">Example Heading Font: Merriweather (Serif - Classic, Readable)</h2>
+                <h3 class="heading-font-merriweather">This is an H3 Heading</h3>
+                <h4 class="heading-font-merriweather">This is an H4 Heading</h4>
+                <p>Merriweather is a serif font, offering a more classic and traditionally readable feel. While less common for tech websites, it could be used to create a sense of trust, authority, or if you want a slightly less overtly "techy" and more broadly appealing style.</p>
+                <p>To use this, set <code>--heading-font-family: 'Merriweather', serif;</code> in your CSS.</p>
+            </section>
+
+
+            <h2 style="margin-top: 40px;">Your Task: Choose a Heading Font</h2>
+            <p><b>Select a heading font for xperienced.ai.</b> Consider:</p>
+            <ul>
+                <li>The overall brand style (minimalist, tech-focused, friendly).</li>
+                <li>Readability and visual impact of the font for headings.</li>
+                <li>How well it pairs with potential body fonts (we'll choose that next).</li>
+                <li>Browse Google Fonts (fonts.google.com) and other font resources for more options.</li>
+                <li>Experiment by changing the <code>--heading-font-family</code> variable in the CSS to see different fonts in action.</li>
+            </ul>
+
+            <p>Once you've made your choice, let me know the font name (e.g., "I choose Oswald for the heading font") and we'll move on to selecting the body font.</p>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2023 xperienced.ai - Heading Font Selection</p>
+    </footer>
+
+</body>
+</html>

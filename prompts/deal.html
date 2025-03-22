@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deals - xperienced.ai</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --red: #dc2626;
+        }
+        .deal-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--red);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
+            position: relative; /* For badge positioning */
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .product-img {
+            height: 200px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .product-img img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .product-specs {
+            font-size: 0.875rem;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--gray);
+            margin-left: 0.5rem;
+        }
+        .filter-section {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-title {
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-checkbox {
+            margin-right: 0.5rem;
+        }
+        .sort-options {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sort-label {
+            margin-right: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .sort-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            appearance: none; /* Remove default arrow in some browsers */
+            -webkit-appearance: none; /* For Safari and Chrome */
+            -moz-appearance: none; /* For Firefox */
+            background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position-x: calc(100% - 0.5rem);
+            background-position-y: center;
+            padding-right: 2rem;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="flex items-center text-blue-600 font-bold text-xl mr-8">
+                    <img src="/api/placeholder/32/32" alt="xperienced.ai logo" class="h-8 w-8 mr-2">
+                    xperienced.ai
+                </a>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="/laptops" class="text-gray-700 hover:text-blue-600">Laptops</a>
+                    <a href="/mobiles" class="text-gray-700 hover:text-blue-600">Mobiles</a>
+                    <a href="/pcs" class="text-gray-700 hover:text-blue-600">PCs</a>
+                    <a href="#" class="text-gray-700 hover:text-blue-600 font-medium">Deals</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative hidden md:block">
+                    <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="absolute right-2 top-2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">
+                    <i class="far fa-user"></i>
+                </a>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 py-2 md:hidden">
+            <div class="relative">
+                <input type="text" placeholder="Search for laptops, mobiles, PCs..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button class="absolute right-2 top-2 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Category Breadcrumb -->
+        <div class="mb-4 text-sm text-gray-500">
+            <a href="/" class="text-blue-600 hover:underline">Home</a> /
+            <span class="font-medium">Deals</span>
+        </div>
+
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Filters Sidebar -->
+            <aside class="md:col-span-1">
+                <div class="bg-white shadow-md rounded-lg p-6 sticky top-8">
+                    <div class="filter-section">
+                        <h3 class="filter-title">Category</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Laptops</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Mobiles</label>
+                            <label><input type="checkbox" class="filter-checkbox"> PCs</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Accessories</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Discount Range</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> 10% and above</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 20% and above</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 30% and above</label>
+                            <label><input type="checkbox" class="filter-checkbox"> 50% and above</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Price Range</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Under $500</label>
+                            <label><input type="checkbox" class="filter-checkbox"> $500 - $1000</label>
+                            <label><input type="checkbox" class="filter-checkbox"> $1000 - $1500</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Over $1500</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Brand</h3>
+                        <div class="filter-group">
+                            <label><input type="checkbox" class="filter-checkbox"> Apple</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Samsung</label>
+                            <label><input type="checkbox" class="filter-checkbox"> Dell</label>
+                            <label><input type="checkbox" class="filter-checkbox"> HP</label>
+                            <!-- More brands -->
+                        </div>
+                    </div>
+
+                    <!-- More filters can be added here -->
+                </div>
+            </aside>
+
+            <!-- Product Listing -->
+            <section class="md:col-span-3">
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">Deals on Electronics</h1>
+
+                <div class="sort-options">
+                    <label for="sort" class="sort-label">Sort By:</label>
+                    <select id="sort" class="sort-select">
+                        <option value="relevance">Relevance</option>
+                        <option value="discount-high-low">Discount (High to Low)</option>
+                        <option value="price-low-high">Price (Low to High)</option>
+                        <option value="price-high-low">Price (High to Low)</option>
+                        <option value="rating">Customer Rating</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Deal Product Card 1 -->
+                    <div class="product-card">
+                        <span class="deal-badge">25% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 1">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Samsung Galaxy Watch 6</h3>
+                            <p class="product-specs">Health Tracking, AMOLED Display, GPS</p>
+                            <p class="product-price">$299 <span class="original-price">$399</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Deal Product Card 2 -->
+                    <div class="product-card">
+                        <span class="deal-badge">15% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 2">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Dell XPS 15 Laptop</h3>
+                            <p class="product-specs">i7, 16GB RAM, 512GB SSD, InfinityEdge Display</p>
+                            <p class="product-price">$1,529 <span class="original-price">$1,799</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Deal Product Card 3 -->
+                    <div class="product-card">
+                        <span class="deal-badge">30% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 3">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Sony WH-1000XM5 Headphones</h3>
+                            <p class="product-specs">Noise Cancelling, Wireless, High-Resolution Audio</p>
+                            <p class="product-price">$279 <span class="original-price">$399</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Deal Product Card 4 -->
+                    <div class="product-card">
+                        <span class="deal-badge">20% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 4">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Logitech MX Master 3S Mouse</h3>
+                            <p class="product-specs">Ergonomic, Wireless, Precision Scrolling</p>
+                            <p class="product-price">$79 <span class="original-price">$99</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Deal Product Card 5 -->
+                    <div class="product-card">
+                        <span class="deal-badge">40% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 5">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Amazon Echo Dot (5th Gen)</h3>
+                            <p class="product-specs">Smart Speaker, Alexa, Voice Control</p>
+                            <p class="product-price">$29 <span class="original-price">$49</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Deal Product Card 6 -->
+                    <div class="product-card">
+                        <span class="deal-badge">10% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 6">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Apple iPad Air (5th Gen)</h3>
+                            <p class="product-specs">M1 Chip, 10.9-inch Liquid Retina Display, 256GB</p>
+                            <p class="product-price">$539 <span class="original-price">$599</span></p>
+                        </div>
+                    </div>
+
+                    <!-- More deal product cards -->
+                     <div class="product-card">
+                        <span class="deal-badge">35% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 7">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">Razer BlackWidow V3 Keyboard</h3>
+                            <p class="product-specs">Mechanical Keyboard, RGB Lighting, Gaming</p>
+                            <p class="product-price">$99 <span class="original-price">$149</span></p>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <span class="deal-badge">45% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 8">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">SanDisk 2TB Portable SSD</h3>
+                            <p class="product-specs">External SSD, High-Speed Transfer, Durable</p>
+                            <p class="product-price">$109 <span class="original-price">$199</span></p>
+                        </div>
+                    </div>
+
+                    <div class="product-card">
+                        <span class="deal-badge">18% Off</span>
+                        <div class="product-img">
+                            <img src="/api/placeholder/200/150" alt="Deal Product 9">
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">LG 27-inch 4K Monitor</h3>
+                            <p class="product-specs">4K UHD, IPS Panel, HDR10, FreeSync</p>
+                            <p class="product-price">$269 <span class="original-price">$329</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex justify-center">
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">Previous</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">1</button>
+                    <button class="px-4 py-2 border border-blue-600 text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">2</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">3</button>
+                    <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 mx-1">Next</button>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">About xperienced.ai</h3>
+                    <p class="text-gray-300">Your AI-powered guide to finding the perfect electronics. We provide expert recommendations and in-depth comparisons to help you make informed decisions.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Explore</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="/laptops">Laptops</a></li>
+                        <li><a href="/mobiles">Mobile Phones</a></li>
+                        <li><a href="/pcs">Desktop PCs</a></li>
+                        <li><a href="#">Product Comparison</a></li>
+                        <li><a href="#">Deals</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Support</h3>
+                    <ul class="text-gray-300 space-y-2">
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="/contact" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-700 pt-8 text-center text-gray-400">
+                <p>© 2025 xperienced.ai. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
